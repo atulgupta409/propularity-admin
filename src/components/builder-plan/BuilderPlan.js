@@ -110,7 +110,7 @@ function ResPropertyType() {
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100">
+        <div className="d-flex justify-content-end w-100 mt-2">
           <Button className="addnew-btn" onClick={onOpen}>
             <BsBookmarkPlus />
             ADD NEW
@@ -120,7 +120,7 @@ function ResPropertyType() {
           <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-              <ModalHeader>Add New State</ModalHeader>
+              <ModalHeader>Add New Plan</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
                 <input
@@ -144,7 +144,7 @@ function ResPropertyType() {
           </Modal>
         </div>
         <div className="table-box">
-          <div className="table-top-box">Coworking Plans Module</div>
+          <div className="table-top-box">Builder Plans Module</div>
           <TableContainer marginTop="60px" variant="striped" color="teal">
             <Table variant="simple">
               <Thead>

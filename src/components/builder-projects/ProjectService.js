@@ -48,10 +48,10 @@ export const getCountry = async (setCountry) => {
   }
 };
 
-export const getBrandsData = async (setBrands) => {
+export const getBuilderData = async (setbuilders) => {
   try {
-    const { data } = await axios.get(`${BASE_URL}/api/brand/brands`);
-    setBrands(data);
+    const { data } = await axios.get(`${BASE_URL}/api/builder/builders`);
+    setbuilders(data);
   } catch (error) {
     console.log(error);
   }
@@ -77,12 +77,12 @@ export const getCategory = async (setCategories) => {
   }
 };
 
-export const getWorkSpaceData = async (setLoading, setWorkSpaces) => {
+export const getProjectData = async (setLoading, setProjects) => {
   try {
     setLoading(true);
-    const { data } = await axios.get(`${BASE_URL}/api/workSpace/workSpaces`);
+    const { data } = await axios.get(`${BASE_URL}/api/project/projects`);
     const newData = data.reverse();
-    setWorkSpaces(newData);
+    setProjects(newData);
 
     setLoading(false);
   } catch (error) {
@@ -90,7 +90,7 @@ export const getWorkSpaceData = async (setLoading, setWorkSpaces) => {
   }
 };
 
-export const changeWorkSpaceStatus = async (
+export const changeProjectStatus = async (
   id,
   action,
   setUpdateTable,
@@ -98,7 +98,7 @@ export const changeWorkSpaceStatus = async (
 ) => {
   try {
     const { data } = await axios.put(
-      `${BASE_URL}/api/workSpace/workSpaces/changeStatus/${id}`,
+      `${BASE_URL}/api/project/changeStatus/${id}`,
       { status: action }
     );
     setUpdateTable((prev) => !prev);
@@ -118,5 +118,36 @@ export const changeWorkSpaceStatus = async (
       isClosable: true,
       position: "bottom-left",
     });
+  }
+};
+
+export const deleteprojects = async (id, toast, setUpdateTable) => {
+  try {
+    const { data } = await axios.delete(`${BASE_URL}/api/project/delete/${id}`);
+    setUpdateTable((prev) => !prev);
+    toast({
+      title: "Deleted Successfully!",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom",
+    });
+  } catch (error) {
+    toast({
+      title: "Error Occured!",
+      description: error.response.data.message,
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+      position: "bottom-left",
+    });
+  }
+};
+export const getProjectsById = async (id) => {
+  try {
+    const { data } = await axios.get(`${BASE_URL}/api/project/projects/${id}`);
+    return data;
+  } catch (error) {
+    console.log(error);
   }
 };

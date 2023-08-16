@@ -68,7 +68,7 @@ function Login() {
       });
 
       login(data, data.token);
-      navigate("/coworking-space", { replace: true });
+      navigate("/builder-projects", { replace: true });
       setLoading(false);
     } catch (error) {
       toast({
@@ -88,14 +88,17 @@ function Login() {
       <div className="mainBox">
         <div className="container my-5">
           <div className="row ml-0 mr-0">
+            <div className="col-md-6 px-0">
+              <img
+                className="img-fluid"
+                src={loginbg}
+                alt="login-bg"
+                style={{ height: "515px", borderRadius: "0 14px 14px 0" }}
+              />
+            </div>
             <div className="col-md-6 px-0 d-flex align-items-center justify-content-center">
               <div style={{ width: "50%" }}>
-                <img
-                  className=""
-                  style={{ width: "130px", margin: "auto" }}
-                  src={logo}
-                  alt="logo"
-                />
+                <h3 className="login-heading">Propularity</h3>
                 <VStack spacing="-10px">
                   <FormControl id="emaillogin" isRequired>
                     <Input
@@ -134,15 +137,6 @@ function Login() {
                   </Button>
                 </VStack>
               </div>
-            </div>
-
-            <div className="col-md-6 px-0">
-              <img
-                className="img-fluid"
-                src={loginbg}
-                alt="login-bg"
-                style={{ height: "515px", borderRadius: "0 14px 14px 0" }}
-              />
             </div>
           </div>
         </div>

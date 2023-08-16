@@ -2,7 +2,7 @@ import { Route, Routes, Navigate } from "react-router";
 import "./App.css";
 import Sidebar from "./components/sidebar/Sidebar";
 import ListingSpace from "./components/listing-space/ListingSpace";
-import CoworkingPlan from "./components/coworking-plans/CoworkingPlan";
+import BuilderPlan from "./components/builder-plan/BuilderPlan";
 import Media from "./components/media/Media";
 import Country from "./components/country/Country";
 import State from "./components/state/State";
@@ -12,22 +12,20 @@ import Amenities from "./components/amenities/Amenities";
 import Login from "./components/login-page/Login";
 import React, { useEffect, useState } from "react";
 import { GpState } from "./context/context";
-import AddWorkSpace from "./components/coworking-space/AddWorkSpace";
-import CoworkingSpace from "./components/coworking-space/CoworkingSpace";
-import Brands from "./components/brands/Brands";
+import AddBuilderprojects from "./components/builder-projects/addBuilderProjects/AddBuilderprojects";
+import BuilderProjects from "./components/builder-projects/BuilderProjects";
+import Builder from "./components/builders/Builder";
 import Seo from "./components/SEO/Seo";
 import AddSeoForm from "./components/SEO/AddSeoForm";
 import EditSeo from "./components/SEO/EditSeo";
-import Addbrand from "./components/brands/Addbrand";
-import EditBrand from "./components/brands/EditBrand";
-import EditWorkSpace from "./components/coworking-space/EditWorkSpace";
 import ImageUpload from "./ImageUpload";
 import OurClient from "./components/ourClients/OurClient";
-import TopPrioritySpace from "./components/prioritySpace/TopPrioritySpace";
-import PriorityMicrolocation from "./components/priorityMicrolocation/PriorityMicrolocation";
-import PopularSpace from "./components/popularSpaces/PopularSpace";
+// import TopPrioritySpace from "./components/prioritySpace/TopPrioritySpace";
+// import PriorityMicrolocation from "./components/priorityMicrolocation/PriorityMicrolocation";
+// import PopularSpace from "./components/popularSpaces/PopularSpace";
 import ForgotPassword from "./components/login-page/ForgotPassword";
 import PasswordReset from "./components/login-page/PasswordReset";
+import AddBuilder from "./components/builders/addbuilders/AddBuilder";
 function App() {
   const { isLogin } = GpState();
   return (
@@ -36,7 +34,7 @@ function App() {
         <div className={isLogin ? "col-md-3" : "d-none"}>
           <Sidebar />
         </div>
-        <div className={isLogin ? "col-md-9" : "col-md-12"}>
+        <div className={isLogin ? "col-md-9 table-aria" : "col-md-12"}>
           <div>
             <Routes>
               <Route
@@ -44,12 +42,12 @@ function App() {
                 element={isLogin ? <ListingSpace /> : <Navigate to="/" />}
               />
               <Route
-                path="/coworking-space"
-                element={isLogin ? <CoworkingSpace /> : <Navigate to="/" />}
+                path="/builder-projects"
+                element={isLogin ? <BuilderProjects /> : <Navigate to="/" />}
               />
               <Route
-                path="/coworking-plan"
-                element={isLogin ? <CoworkingPlan /> : <Navigate to="/" />}
+                path="/builder-plan"
+                element={isLogin ? <BuilderPlan /> : <Navigate to="/" />}
               />
               <Route
                 path="/media"
@@ -58,7 +56,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  !isLogin ? <Login /> : <Navigate to="/coworking-space" />
+                  !isLogin ? <Login /> : <Navigate to="/builder-projects" />
                 }
               />
               <Route
@@ -86,32 +84,32 @@ function App() {
                 element={isLogin ? <Seo /> : <Navigate to="/" />}
               />
               <Route
-                path="/coworking-space/add-coworking-space"
-                element={isLogin ? <AddWorkSpace /> : <Navigate to="/" />}
+                path="/builder-projects/add-builder-projects"
+                element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
               />
               <Route
                 path="/seo/add-seo"
                 element={isLogin ? <AddSeoForm /> : <Navigate to="/" />}
               />
               <Route
-                path="/brands"
-                element={isLogin ? <Brands /> : <Navigate to="/" />}
+                path="/builder"
+                element={isLogin ? <Builder /> : <Navigate to="/" />}
               />
               <Route
                 path="/seo/editseo/:id"
                 element={isLogin ? <EditSeo /> : <Navigate to="/" />}
               />
               <Route
-                path="/brands/add-brand"
-                element={isLogin ? <Addbrand /> : <Navigate to="/" />}
+                path="/builder/add-builder"
+                element={isLogin ? <AddBuilder /> : <Navigate to="/" />}
               />
               <Route
-                path="/brands/edit-brand/:id"
-                element={isLogin ? <EditBrand /> : <Navigate to="/" />}
+                path="/builder/edit-builder/:id"
+                element={isLogin ? <AddBuilder /> : <Navigate to="/" />}
               />
               <Route
-                path="/coworking-space/edit-workspace/:id"
-                element={isLogin ? <EditWorkSpace /> : <Navigate to="/" />}
+                path="/builder-projects/edit-project/:id"
+                element={isLogin ? <AddBuilderprojects /> : <Navigate to="/" />}
               />
               <Route
                 path="/image"
@@ -121,20 +119,20 @@ function App() {
                 path="/clients"
                 element={isLogin ? <OurClient /> : <Navigate to="/" />}
               />
-              <Route
+              {/* <Route
                 path="/priority"
                 element={isLogin ? <TopPrioritySpace /> : <Navigate to="/" />}
-              />
-              <Route
+              /> */}
+              {/* <Route
                 path="/priority-microlocation"
                 element={
                   isLogin ? <PriorityMicrolocation /> : <Navigate to="/" />
                 }
-              />
-              <Route
+              /> */}
+              {/* <Route
                 path="/popular-spaces"
                 element={isLogin ? <PopularSpace /> : <Navigate to="/" />}
-              />
+              /> */}
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route
                 path="/forgotpassword/:id/:token"

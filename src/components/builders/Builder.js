@@ -20,34 +20,28 @@ import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { AiOutlineEye } from "react-icons/ai";
 import BASE_URL from "../../apiConfig";
-const Brands = () => {
+import { getbuildersData } from "./BuilderService";
+const Builder = () => {
   const [loading, setLoading] = useState(false);
-  const [brands, setBrands] = useState([]);
+  const [builders, setbuilders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchedBrands, setSearchedBrands] = useState([]);
+  const [searchedbuilders, setSearchedbuilders] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [showAll, setShowAll] = useState(true);
   const toast = useToast();
 
-  const getBrandsData = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/brand/brands`);
-      const newData = data.reverse();
-
-      setBrands(newData);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleFetchBuilders = async () => {
+    await getbuildersData(setbuilders, setLoading);
   };
   useEffect(() => {
-    getBrandsData();
-  }, [updateTable]);
+    handleFetchBuilders();
+  }, []);
 
-  const handleDeleteBrands = async (id) => {
+  const handleDeletebuilders = async (id) => {
     try {
-      const { data } = await axios.delete(`${BASE_URL}/api/brand/delete/${id}`);
+      const { data } = await axios.delete(
+        `${BASE_URL}/api/builder/delete/${id}`
+      );
       setUpdateTable((prev) => !prev);
       toast({
         title: "Deleted Successfully!",
@@ -68,15 +62,15 @@ const Brands = () => {
     }
   };
   const handleSearch = () => {
-    const filteredBrands = brands.filter((brand) => {
+    const filteredbuilders = builders.filter((builder) => {
       const matchName =
-        brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(brand.name.toLowerCase());
+        builder.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        searchTerm.toLowerCase().includes(builder.name.toLowerCase());
 
       return matchName;
     });
 
-    setSearchedBrands(filteredBrands);
+    setSearchedbuilders(filteredbuilders);
     setCurPage(1);
   };
 
@@ -94,7 +88,7 @@ const Brands = () => {
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? brands.length : searchedBrands.length) / selectItemNum
+    (showAll ? builders.length : searchedbuilders.length) / selectItemNum
   );
   if (firstIndex > 0) {
     var prePage = () => {
@@ -106,7 +100,7 @@ const Brands = () => {
 
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? brands.length : searchedBrands.length) / selectItemNum
+      (showAll ? builders.length : searchedbuilders.length) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -125,11 +119,11 @@ const Brands = () => {
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <Link to="/brands/add-brand" className="btnLink mt-2">
+        <Link to="/builder/add-builder" className="btnLink mt-2">
           <Addpropertybtn buttonText={"ADD NEW"} />
         </Link>
         <div className="table-box space-table-box">
-          <div className="table-top-box">Brands Module</div>
+          <div className="table-top-box">Builder Module</div>
           <TableContainer
             marginTop="60px"
             variant="striped"
@@ -175,25 +169,22 @@ const Brands = () => {
                     </Td>
                   </Tr>
                 ) : showAll ? (
-                  brands
+                  builders
                     .slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     )
-                    .map((brand) => (
-                      <Tr key={brand._id} id={brand._id}>
-                        <Td>{brand.name.toUpperCase()}</Td>
+                    .map((builder) => (
+                      <Tr key={builder._id} id={builder._id}>
+                        <Td>{builder.name.toUpperCase()}</Td>
                         <Td className="tableDescription">
-                          {(brand.description?.length > 50
-                            ? brand.description.substring(0, 50) + "..."
-                            : brand.description) || "Empty"}
+                          {(builder?.seo?.description?.length > 50
+                            ? builder?.seo?.description.substring(0, 50) + "..."
+                            : builder?.seo?.description) || "Empty"}
                         </Td>
 
                         <Td>
-                          <Link
-                            to={`/brands/edit-brand/${brand._id}`}
-                            target="_blank"
-                          >
+                          <Link to={`/builder/edit-builder/${builder._id}`}>
                             <AiFillEdit
                               style={{ fontSize: "22px", cursor: "pointer" }}
                             />
@@ -201,31 +192,30 @@ const Brands = () => {
                         </Td>
                         <Td>
                           <Delete
-                            handleFunction={() => handleDeleteBrands(brand._id)}
+                            handleFunction={() =>
+                              handleDeletebuilders(builder._id)
+                            }
                           />
                         </Td>
                       </Tr>
                     ))
-                ) : searchedBrands.length > 0 ? (
-                  searchedBrands
+                ) : searchedbuilders.length > 0 ? (
+                  searchedbuilders
                     .slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     )
-                    .map((brand) => (
-                      <Tr key={brand._id} id={brand._id}>
-                        <Td>{brand.name}</Td>
+                    .map((builder) => (
+                      <Tr key={builder._id} id={builder._id}>
+                        <Td>{builder.name}</Td>
                         <Td className="tableDescription">
-                          {(brand?.description?.length > 50
-                            ? brand?.description.substring(0, 50) + "..."
-                            : brand?.description) || "Empty"}
+                          {(builder?.seo?.description?.length > 50
+                            ? builder?.seo?.description.substring(0, 50) + "..."
+                            : builder?.seo?.description) || "Empty"}
                         </Td>
 
                         <Td>
-                          <Link
-                            to={`/brands/edit-brand/${brand._id}`}
-                            target="_blank"
-                          >
+                          <Link to={`/builder/edit-builder/${builder._id}`}>
                             <AiFillEdit
                               style={{ fontSize: "22px", cursor: "pointer" }}
                             />
@@ -233,7 +223,9 @@ const Brands = () => {
                         </Td>
                         <Td>
                           <Delete
-                            handleFunction={() => handleDeleteBrands(brand._id)}
+                            handleFunction={() =>
+                              handleDeletebuilders(builder._id)
+                            }
                           />
                         </Td>
                       </Tr>
@@ -268,15 +260,15 @@ const Brands = () => {
               <div style={{ width: "110px" }}>
                 {firstIndex + 1} -{" "}
                 {showAll
-                  ? brands.slice(
+                  ? builders.slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     ).length + firstIndex
-                  : searchedBrands?.slice(
+                  : searchedbuilders?.slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     ).length + firstIndex}{" "}
-                of {showAll ? brands?.length : searchedBrands.length}
+                of {showAll ? builders?.length : searchedbuilders.length}
               </div>
 
               <div className="page-item">
@@ -299,4 +291,4 @@ const Brands = () => {
   );
 };
 
-export default Brands;
+export default Builder;

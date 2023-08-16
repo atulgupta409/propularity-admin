@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import "./CoworkingSpace.css";
+import "./BuilderProject.css";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
 import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { AiOutlineEye } from "react-icons/ai";
-import { changeWorkSpaceStatus } from "./WorkSpaceService";
+import {
+  changeProjectStatus,
+  deleteprojects,
+  getProjectData,
+} from "./ProjectService";
 import {
   Table,
   Thead,
@@ -17,40 +21,37 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
-import { getWorkSpaceData } from "./WorkSpaceService";
 import Desable from "../delete/Desable";
 import Approve from "../delete/Approve";
-import BASE_URL from "../../apiConfig";
 function CoworkingSpace() {
   const [loading, setLoading] = useState(false);
-  const [workSpaces, setWorkSpaces] = useState([]);
+  const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [citySearchTerm, setCitySearchTerm] = useState("");
   const [microLocationSearchTerm, setMicroLocationSearchTerm] = useState("");
-  const [searchedWorkSpaces, setSearchedWorkSpaces] = useState([]);
+  const [searchedprojects, setSearchedprojects] = useState([]);
   const [showAll, setShowAll] = useState(true);
   const [searchOption, setSearchOption] = useState("");
 
   const toast = useToast();
 
-  const handleFetchWorkSpace = async () => {
-    await getWorkSpaceData(setLoading, setWorkSpaces);
+  const handleFetchproject = async () => {
+    await getProjectData(setLoading, setprojects);
   };
 
   const handleSearch = () => {
-    const filteredWorkSpaces = workSpaces.filter((workSpace) => {
-      const cityName = workSpace.location.city?.name || "city";
+    const filteredprojects = projects.filter((project) => {
+      const cityName = project.location.city?.name || "city";
       const microLocationName =
-        workSpace.location.micro_location?.name || "microlocation";
-      const statusName = workSpace.status;
+        project.location.micro_location?.name || "microlocation";
+      const statusName = project.status;
       const matchName =
-        workSpace.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(workSpace.name.toLowerCase());
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        searchTerm.toLowerCase().includes(project.name.toLowerCase());
 
       const matchCity =
         cityName.toLowerCase().includes(citySearchTerm.toLowerCase()) ||
@@ -65,17 +66,17 @@ function CoworkingSpace() {
           .includes(microLocationName.toLowerCase());
       const matchStatus =
         statusName.includes(searchOption) || searchOption === "All"
-          ? workSpace
+          ? project
           : "";
       return matchName && matchCity && matchMicroLocation && matchStatus;
     });
 
-    setSearchedWorkSpaces(filteredWorkSpaces);
+    setSearchedprojects(filteredprojects);
     setCurPage(1);
   };
 
   useEffect(() => {
-    handleFetchWorkSpace();
+    handleFetchproject();
     handleSearch();
     setShowAll(
       searchTerm === "" &&
@@ -90,40 +91,19 @@ function CoworkingSpace() {
     microLocationSearchTerm,
     searchOption,
   ]);
-  const handleDeleteWorkSpaces = async (id) => {
-    try {
-      const { data } = await axios.delete(
-        `${BASE_URL}/api/workSpace/delete/${id}`
-      );
-      setUpdateTable((prev) => !prev);
-      toast({
-        title: "Deleted Successfully!",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Occured!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom-left",
-      });
-    }
+  const handleDeleteprojects = async (id) => {
+    await deleteprojects(id, toast, setUpdateTable);
   };
 
   const handleApprove = async (id) => {
-    await changeWorkSpaceStatus(id, "approve", setUpdateTable, toast);
+    await changeProjectStatus(id, "approve", setUpdateTable, toast);
     setSearchTerm("");
     setCitySearchTerm("");
     setMicroLocationSearchTerm("");
     setSearchOption("");
   };
   const handleReject = async (id) => {
-    await changeWorkSpaceStatus(id, "reject", setUpdateTable, toast);
+    await changeProjectStatus(id, "reject", setUpdateTable, toast);
     setSearchTerm("");
     setCitySearchTerm("");
     setMicroLocationSearchTerm("");
@@ -138,7 +118,7 @@ function CoworkingSpace() {
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? workSpaces.length : searchedWorkSpaces?.length) / selectItemNum
+    (showAll ? projects.length : searchedprojects?.length) / selectItemNum
   );
   if (firstIndex > 0) {
     var prePage = () => {
@@ -150,7 +130,7 @@ function CoworkingSpace() {
 
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? workSpaces.length : searchedWorkSpaces.length) / selectItemNum
+      (showAll ? projects.length : searchedprojects.length) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -167,11 +147,14 @@ function CoworkingSpace() {
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-      <Link to="/coworking-space/add-coworking-space" className="btnLink mt-2">
-        <Addpropertybtn buttonText={"ADD NEW CW"} />
+      <Link
+        to="/builder-projects/add-builder-projects"
+        className="btnLink mt-2"
+      >
+        <Addpropertybtn buttonText={"ADD PROJECT"} />
       </Link>
       <div className="table-box space-table-box">
-        <div className="table-top-box">Coworking Module</div>
+        <div className="table-top-box">Builder Projects Module</div>
         <TableContainer overflowX="hidden">
           <div className="row my-5">
             <div className="col-md-3">
@@ -184,7 +167,7 @@ function CoworkingSpace() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <label htmlFor="floatingInput">Search By CW Name</label>
+                <label htmlFor="floatingInput">Search By Name</label>
               </div>
             </div>
             <div className="col-md-3">
@@ -238,7 +221,7 @@ function CoworkingSpace() {
                 <Table variant="simple">
                   <Thead>
                     <Tr className="table_heading_row">
-                      <Th className="name_heading">NAME OF CW</Th>
+                      <Th className="name_heading">NAME OF PROJECT</Th>
                       <Th className="city_heading">CITY</Th>
                       <Th className="micro_heading">LOCATION</Th>
                       <Th className="time_heading">ADDED ON</Th>
@@ -256,23 +239,23 @@ function CoworkingSpace() {
                         </Td>
                       </Tr>
                     ) : showAll ? (
-                      workSpaces
+                      projects
                         ?.slice(
                           (curPage - 1) * selectItemNum,
                           curPage * selectItemNum
                         )
 
-                        .map((workSpace) => (
-                          <Tr className="table_data_row" key={workSpace._id}>
-                            <Td className="name_heading">{workSpace.name}</Td>
+                        .map((project) => (
+                          <Tr className="table_data_row" key={project._id}>
+                            <Td className="name_heading">{project.name}</Td>
                             <Td className="city_heading">
-                              {workSpace.location.city
-                                ? workSpace.location.city.name
+                              {project.location.city
+                                ? project.location.city.name
                                 : ""}
                             </Td>
                             <Td className="micro_heading">
-                              {workSpace.location.micro_location
-                                ? workSpace.location.micro_location.name
+                              {project.location.micro_location
+                                ? project.location.micro_location.name
                                 : ""}
                             </Td>
 
@@ -281,21 +264,20 @@ function CoworkingSpace() {
                                 day: "2-digit",
                                 month: "2-digit",
                                 year: "numeric",
-                              }).format(new Date(workSpace.createdAt))}
+                              }).format(new Date(project.createdAt))}
                             </Td>
                             <Td className="status_heading" textAlign="center">
-                              {workSpace.status === "approve"
+                              {project.status === "approve"
                                 ? "AP"
-                                : workSpace.status === "reject"
+                                : project.status === "reject"
                                 ? "RJ"
-                                : workSpace.status === "pending"
+                                : project.status === "pending"
                                 ? "PD"
                                 : ""}
                             </Td>
                             <Td className="edit_heading">
                               <Link
-                                to={`/coworking-space/edit-workspace/${workSpace._id}`}
-                                target="_blank"
+                                to={`/builder-projects/edit-project/${project._id}`}
                               >
                                 <AiFillEdit
                                   style={{
@@ -307,7 +289,7 @@ function CoworkingSpace() {
                             </Td>
                             <Td className="preview_heading">
                               <Link
-                                to={`https://spacite.com/coworking/${workSpace.slug}`}
+                                to={`https://spacite.com/coworking/${project.slug}`}
                                 target="_blank"
                               >
                                 <AiOutlineEye
@@ -326,42 +308,42 @@ function CoworkingSpace() {
                               >
                                 <Approve
                                   handleFunction={() =>
-                                    handleApprove(workSpace._id)
+                                    handleApprove(project._id)
                                   }
                                 />
                                 <Desable
                                   handleFunction={() =>
-                                    handleReject(workSpace._id)
+                                    handleReject(project._id)
                                   }
                                 />
 
                                 <Delete
                                   handleFunction={() =>
-                                    handleDeleteWorkSpaces(workSpace._id)
+                                    handleDeleteprojects(project._id)
                                   }
                                 />
                               </div>
                             </Td>
                           </Tr>
                         ))
-                    ) : searchedWorkSpaces.length > 0 ? (
-                      searchedWorkSpaces
+                    ) : searchedprojects.length > 0 ? (
+                      searchedprojects
                         .slice(
                           (curPage - 1) * selectItemNum,
                           curPage * selectItemNum
                         )
 
-                        .map((workSpace, index) => (
-                          <Tr className="table_data_row" key={workSpace._id}>
-                            <Td className="name_heading">{workSpace.name}</Td>
+                        .map((project, index) => (
+                          <Tr className="table_data_row" key={project._id}>
+                            <Td className="name_heading">{project.name}</Td>
                             <Td className="city_heading">
-                              {workSpace.location.city
-                                ? workSpace.location.city.name
+                              {project.location.city
+                                ? project.location.city.name
                                 : ""}
                             </Td>
                             <Td className="micro_heading">
-                              {workSpace.location.micro_location
-                                ? workSpace.location.micro_location.name
+                              {project.location.micro_location
+                                ? project.location.micro_location.name
                                 : ""}
                             </Td>
 
@@ -370,21 +352,20 @@ function CoworkingSpace() {
                                 day: "2-digit",
                                 month: "2-digit",
                                 year: "numeric",
-                              }).format(new Date(workSpace.createdAt))}
+                              }).format(new Date(project.createdAt))}
                             </Td>
                             <Td className="status_heading" textAlign="center">
-                              {workSpace.status === "approve"
+                              {project.status === "approve"
                                 ? "AP"
-                                : workSpace.status === "reject"
+                                : project.status === "reject"
                                 ? "RJ"
-                                : workSpace.status === "pending"
+                                : project.status === "pending"
                                 ? "PD"
                                 : ""}
                             </Td>
                             <Td className="edit_heading">
                               <Link
-                                to={`/coworking-space/edit-workspace/${workSpace._id}`}
-                                target="_blank"
+                                to={`/builder-projects/edit-project/${project._id}`}
                               >
                                 <AiFillEdit
                                   style={{
@@ -396,7 +377,7 @@ function CoworkingSpace() {
                             </Td>
                             <Td className="preview_heading">
                               <Link
-                                to={`https://spacite.com/coworking/${workSpace.slug}`}
+                                to={`https://spacite.com/coworking/${project.slug}`}
                                 target="_blank"
                               >
                                 <AiOutlineEye
@@ -415,18 +396,18 @@ function CoworkingSpace() {
                               >
                                 <Approve
                                   handleFunction={() =>
-                                    handleApprove(workSpace._id)
+                                    handleApprove(project._id)
                                   }
                                 />
                                 <Desable
                                   handleFunction={() =>
-                                    handleReject(workSpace._id)
+                                    handleReject(project._id)
                                   }
                                 />
 
                                 <Delete
                                   handleFunction={() =>
-                                    handleDeleteWorkSpaces(workSpace._id)
+                                    handleDeleteprojects(project._id)
                                   }
                                 />
                               </div>
@@ -466,15 +447,15 @@ function CoworkingSpace() {
             <div style={{ width: "110px" }}>
               {firstIndex + 1} -{" "}
               {showAll
-                ? workSpaces.slice(
+                ? projects.slice(
                     (curPage - 1) * selectItemNum,
                     curPage * selectItemNum
                   ).length + firstIndex
-                : searchedWorkSpaces?.slice(
+                : searchedprojects?.slice(
                     (curPage - 1) * selectItemNum,
                     curPage * selectItemNum
                   ).length + firstIndex}{" "}
-              of {showAll ? workSpaces?.length : searchedWorkSpaces.length}
+              of {showAll ? projects?.length : searchedprojects.length}
             </div>
 
             <div className="page-item">

@@ -13,6 +13,9 @@ input {
 form {
   text-align: center;
 }
+.login-heading {
+  font-weight: 600;
+}
 /* .btn {
   width: 132px;
   font-size: 16px;

@@ -10,7 +10,7 @@
   left: 0;
   z-index: 2;
   width: 269px;
-  background: #ffffff1b;
+  background: #fff;
   box-shadow: 0 16px 38px -12px rgba(66, 43, 43, 0.56),
     0 4px 25px 0 rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
 }
@@ -59,7 +59,7 @@ tbody {
   font-size: 15px;
 }
 .saveproperty-btn {
-  background-color: #a55bea;
+  background-color: #ff385c;
   color: white;
   width: 100px;
   height: 35px;
@@ -109,7 +109,7 @@ input[type="file"]::file-selector-button:active {
   float: right;
 }
 .addnew-btn {
-  background-color: #a55bea !important;
+  background: #ff385c !important;
   color: white;
   width: 150px;
   height: 35px;
@@ -120,7 +120,7 @@ input[type="file"]::file-selector-button:active {
   border-radius: 4px;
 }
 .table-box {
-  margin: 76px 0px;
+  margin: 55px 0px;
   background-color: #fff;
   border-radius: 9px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
@@ -131,7 +131,7 @@ input[type="file"]::file-selector-button:active {
 .table-top-box {
   position: absolute;
   width: 95%;
-  background: #f4fafe;
+  background: #fff0f1;
   color: black;
   height: 74px;
   padding: 14px;
@@ -221,4 +221,7 @@ input[type="file"]::file-selector-button:active {
 .editorClassName {
   resize: both;
   overflow: auto;
+}
+.table-aria {
+  background-color: #fff9fa;
 }

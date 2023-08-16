@@ -183,7 +183,7 @@ function OurClient() {
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100">
+        <div className="d-flex justify-content-end w-100 mt-2">
           <Button className="addnew-btn" onClick={onOpen}>
             <BsBookmarkPlus />
             ADD NEW

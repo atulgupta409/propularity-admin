@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
-import logo from "../login-page/spacite-logo.png";
+import logo from "./propularity.png";
 import {
   HiOutlineBuildingOffice2,
   HiOutlineBuildingOffice,
@@ -85,42 +85,43 @@ function Sidebar() {
         <div className="nav-menu-wrapper">
           <ul className="nav">
             <li className="nav-item">
-              <NavLink to="/coworking-space">
+              <NavLink to="/builder-projects">
                 <HiOutlineBuildingOffice className="icon" />
-                Coworking Space
+                Builder Projects
               </NavLink>
             </li>
             <li className="nav-item">
+              <NavLink to="/builder-plan">
+                <HiOutlineBuildingOffice className="icon" />
+                Project Types
+              </NavLink>
+            </li>
+            {/* <li className="nav-item">
               <NavLink to="/priority">
                 <HiOutlineBuildingOffice className="icon" />
                 Top Priority Space
               </NavLink>
-            </li>
-            <li className="nav-item">
+            </li> */}
+            {/* <li className="nav-item">
               <NavLink to="/popular-spaces">
                 <HiOutlineBuildingOffice className="icon" />
                 Popular Spaces
               </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink to="/coworking-plan">
-                <HiOutlineBuildingOffice className="icon" />
-                Coworking Plans
-              </NavLink>
-            </li>
-            <li className="nav-item">
+            </li> */}
+
+            {/* <li className="nav-item">
               <NavLink to="/priority-microlocation">
                 <IoLocationOutline className="icon" />
                 Priority Location
               </NavLink>
-            </li>
+            </li> */}
             <li className="nav-item">
-              <NavLink to="/brands">
+              <NavLink to="/builder">
                 <MdOutlineRealEstateAgent className="icon" />
-                Brands
+                Builder
               </NavLink>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink to="/seo">
                 <MdOutlineRealEstateAgent className="icon" />
                 SEO
@@ -132,7 +133,7 @@ function Sidebar() {
                 <MdOutlinePermMedia className="icon" />
                 Media
               </NavLink>
-            </li>
+            </li> */}
             <li className="nav-item">
               <NavLink to="/country">
                 <IoEarthOutline className="icon" />

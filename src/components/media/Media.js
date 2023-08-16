@@ -200,7 +200,7 @@ function Media() {
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100">
+        <div className="d-flex justify-content-end w-100 mt-2">
           <Button className="addnew-btn" onClick={onOpen}>
             <BsBookmarkPlus />
             ADD NEW
@@ -273,37 +273,7 @@ function Media() {
                   <Th>Delete</Th>
                 </Tr>
               </Thead>
-              {/* <Tbody>
-                {loading ? (
-                  <Tr>
-                    <Td align="center" style={{ width: "50px" }}>
-                      <Spinner
-                        size="xl"
-                        w={20}
-                        h={20}
-                        alignSelf="center"
-                        style={{ position: "absolute", left: "482px" }}
-                      />
-                    </Td>
-                  </Tr>
-                ) : (
-                  records?.map((image) => (
-                    <Tr key={image._id} id={image._id}>
-                      <Td>
-                        {image.real_name.length > 16
-                          ? image.real_name.substring(0, 16) + ".."
-                          : image.real_name}
-                      </Td>
-                      <Td>{image.name}</Td>
-                      <Td>
-                        <Delete
-                          handleFunction={() => deleteImages(image._id)}
-                        />
-                      </Td>
-                    </Tr>
-                  ))
-                )}
-              </Tbody> */}
+
               <Tbody>
                 {loading ? (
                   <Tr>

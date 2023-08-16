@@ -17,7 +17,7 @@ import {
 import "./TopPriority.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { getMicrolocationByCity } from "../coworking-space/WorkSpaceService";
+import { getMicrolocationByCity } from "../builder-projects/WorkSpaceService";
 import { getCity } from "../brands/BrandService";
 import Select from "react-select";
 import {

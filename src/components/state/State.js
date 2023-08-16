@@ -29,7 +29,7 @@ import axios from "axios";
 import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
 import BASE_URL from "../../apiConfig";
-import { getCountry } from "../coworking-space/WorkSpaceService";
+import { getCountry } from "../builder-projects/ProjectService";
 import { deleteStates, getState } from "./stateService";
 import Select from "react-select";
 function State() {
@@ -177,7 +177,7 @@ function State() {
     <>
       <div className="mx-5 mt-3">
         <Mainpanelnav />
-        <div className="d-flex justify-content-end w-100">
+        <div className="d-flex justify-content-end w-100 mt-2">
           <Button className="addnew-btn" onClick={onOpen}>
             <BsBookmarkPlus />
             ADD NEW

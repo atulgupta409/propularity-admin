@@ -32,13 +32,12 @@
   display: inline-block;
 }
 .nav-menu-wrapper .nav li a:hover {
-  background-color: rgba(235, 233, 233, 0.34);
+  background-color: #fff9fa;
 }
 .active {
-  background-color: #f4fafe !important;
+  background-color: #fff0f1 !important;
   color: black !important;
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14),
-    0 7px 10px -5px rgba(0, 188, 212, 0.4);
+  box-shadow: 0px 0px 11px -6px rgba(0, 0, 0, 0.1);
 }
 .nav-item {
   list-style: none;
@@ -61,5 +60,5 @@
   background-color: white;
 }
 .nav-menu-wrapper:hover::-webkit-scrollbar-thumb {
-  background-color: #d7b4f8;
+  background-color: #fff0f1;
 }
