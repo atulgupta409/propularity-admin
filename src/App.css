@@ -14,6 +14,9 @@
   box-shadow: 0 16px 38px -12px rgba(66, 43, 43, 0.56),
     0 4px 25px 0 rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
 }
+.admin_main{
+  height: 100vh;
+}
 .admin_main .col-md-3 {
   width: 269px;
 }

@@ -24,17 +24,29 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { GpState } from "../../context/context";
 import Delete from "../delete/Delete";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import BASE_URL from "../../apiConfig";
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+
+const GET_AMENITIES = gql`
+  query {
+    amenities {
+      name
+      icon
+    }
+  }
+`;
 function Amenities() {
+  const { loading, error, data } = useQuery(GET_AMENITIES);
+ 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("");
   const [updateTable, setUpdateTable] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
   const [amenities, setAmenities] = useState([]);
   const [searchedAmenities, setSearchedAmenities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,17 +82,18 @@ function Amenities() {
     }
   };
 
-  const getAmenities = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${BASE_URL}/api/amenity/amenities`);
-      const newData = data.reverse();
-      setAmenities(newData);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getAmenities = async () => {
+  //   try {
+  //     setisLoading(true);
+  //     const { data } = await axios.get(`${BASE_URL}/api/amenity/amenities`);
+  //     const newData = data.reverse();
+  //     setAmenities(newData);
+  //     setisLoading(false);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
   const handleDeleteAmenities = async (id) => {
     try {
       const { data } = await axios.delete(
@@ -106,8 +119,10 @@ function Amenities() {
     }
   };
   useEffect(() => {
-    getAmenities();
-  }, [updateTable]);
+    if(!loading){
+      setAmenities(data?.amenities)
+    }
+  }, [data?.amenities]);
   const handleSearch = () => {
     const filteredAmenities = amenities.filter((amenity) => {
       const matchName =
@@ -161,7 +176,7 @@ function Amenities() {
   const getLastPage = () => {
     setCurPage(nPage);
   };
-
+  console.log(amenities)
   return (
     <>
       <div className="mx-5 mt-3">

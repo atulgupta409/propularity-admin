@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.8.1",
     "@chakra-ui/react": "^2.6.1",
     "@pqina/pintura": "^8.60.2",
     "@pqina/react-pintura": "^9.0.1",

@@ -92,7 +92,7 @@ const ProjectDetails = () => {
       setSelectedBuilder(null);
     }
   }, [builders]);
-  console.log(selectedBuilder);
+
 
   return (
     <>

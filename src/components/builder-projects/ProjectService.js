@@ -1,6 +1,6 @@
 import axios from "axios";
 import BASE_URL from "../../apiConfig";
-
+import { gql } from '@apollo/client';
 export const getStateByCountry = async (countryId, setStates) => {
   try {
     const result = await axios.get(
@@ -77,14 +77,11 @@ export const getCategory = async (setCategories) => {
   }
 };
 
-export const getProjectData = async (setLoading, setProjects) => {
+export const getProjectData = async () => {
   try {
-    setLoading(true);
-    const { data } = await axios.get(`${BASE_URL}/api/project/projects`);
-    const newData = data.reverse();
-    setProjects(newData);
 
-    setLoading(false);
+    const { data } = await axios.get(`${BASE_URL}/api/project/projects`);
+    return data;
   } catch (error) {
     console.log(error);
   }
@@ -151,3 +148,26 @@ export const getProjectsById = async (id) => {
     console.log(error);
   }
 };
+
+
+export const SEARCH_PROJECTS = gql`
+  query SearchProjects($name: String, $city: String, $microlocation: String, $status: String) {
+    searchProjects(name: $name, city: $city, microlocation: $microlocation, status: $status) {
+      _id 
+      name
+      slug
+      location{
+        city{
+          name
+        }
+        micro_location{
+          name
+        }
+      }
+      status
+      createdAt
+    } 
+  }
+`;
+
+

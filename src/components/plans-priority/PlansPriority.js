@@ -11,48 +11,51 @@ import {
   Td,
   TableContainer,
   Spinner,
-  useToast,
 } from "@chakra-ui/react";
-import "./PriorityMicrolocation.css";
 import axios from "axios";
-import { getMicrolocationByCity } from "./PriorityService";
-import { getCity } from "../builders/BuilderService";
 import Select from "react-select";
 import BASE_URL from "../../apiConfig";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { getMicrolocationWithPriority } from "./PriorityService";
-function PriorityMicrolocation() {
+import {
+  getTopProjectsByPlanType,
+  getProjectsDataByPlanType,
+} from "./PlansPriorityService";
+import { getPropertyTypes } from "./PlansPriorityService";
+function BuilderPriority() {
+  const [loading, setLoading] = useState(false);
+  const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchedprojects, setSearchedprojects] = useState([]);
   const [showAll, setShowAll] = useState(true);
-  const [searchedMicrolocation, setSearchedMicrolocation] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [microlocations, setMicrolocations] = useState([]);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [priorityMicrolocation, setPriorityMicrolocation] = useState([]);
-  const [loadingMicro, setLoadingMicro] = useState(false);
-  const [loadingAllMicro, setLoadingAllMicro] = useState(false);
-  const handleFetchCity = async () => {
-    await getCity(setCities);
+  const [planTypes, setPlanTypes] = useState([]);
+  const [selectedPlanType, setSelectedPlanType] = useState(null);
+  const [priorityprojects, setPriorityprojects] = useState([]);
+  const [loadingTable, setLoadingTable] = useState(false);
+  const handleFetchTypes = async () => {
+  const data =  await getPropertyTypes();
+  setPlanTypes(data)
   };
-  const handleFetchMicrolocation = async (cityId) => {
-    await getMicrolocationByCity(cityId, setMicrolocations, setLoadingAllMicro);
+  const handleFetchProjects = async (builderId) => {
+    setLoading(true)
+  const data = await getProjectsDataByPlanType(builderId);
+  setprojects(data)
+  setLoading(false)
     setSearchTerm("");
   };
-  const handleFetchPriorityMicrolocation = async (cityId) => {
-    await getMicrolocationWithPriority(
-      setLoadingMicro,
-      setPriorityMicrolocation,
-      cityId
-    );
+  const handleFetchTopProjects = async (builderId) => {
+    setLoadingTable(true)
+    const data = await getTopProjectsByPlanType(builderId)
+    setPriorityprojects(data)
+    setLoadingTable(false)
   };
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
-      case "city":
-        setSelectedCity(selectedOption);
+      case "PlanType":
+        setSelectedPlanType(selectedOption);
 
-        handleFetchMicrolocation(selectedOption ? selectedOption.value : null);
-        handleFetchPriorityMicrolocation(
+        handleFetchProjects(selectedOption ? selectedOption.value : null);
+        handleFetchTopProjects(
           selectedOption ? selectedOption.value : null
         );
         break;
@@ -60,10 +63,28 @@ function PriorityMicrolocation() {
         break;
     }
   };
-  const cityOptions = cities?.map((city) => ({
-    value: city._id,
-    label: city.name,
+  const planTypesOptions = planTypes?.map((type) => ({
+    value: type._id,
+    label: type.name,
   }));
+
+  const handleSearch = () => {
+    const filteredprojects = projects.filter((workproject) => {
+      const matchName =
+        workproject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        searchTerm.toLowerCase().includes(workproject.name.toLowerCase());
+      return matchName;
+    });
+
+    setSearchedprojects(filteredprojects);
+    setCurPage(1);
+  };
+
+  useEffect(() => {
+    handleSearch();
+    handleFetchTypes();
+    setShowAll(searchTerm === "");
+  }, [updateTable, searchTerm]);
 
   const [selectItemNum, setSelectItemNum] = useState(10);
   const itemsPerPageHandler = (e) => {
@@ -74,10 +95,8 @@ function PriorityMicrolocation() {
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? microlocations.length : searchedMicrolocation?.length) /
-      recordsPerPage
+    (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
   );
-
   if (firstIndex > 0) {
     var prePage = () => {
       if (curPage !== firstIndex) {
@@ -85,11 +104,9 @@ function PriorityMicrolocation() {
       }
     };
   }
-
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? microlocations.length : searchedMicrolocation.length) /
-        selectItemNum
+      (showAll ? projects.length : searchedprojects.length) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -103,98 +120,71 @@ function PriorityMicrolocation() {
   const getLastPage = () => {
     setCurPage(nPage);
   };
-  const handleSearch = () => {
-    const filteredMicrolocation = microlocations.filter((micro) => {
-      const matchName =
-        micro.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(micro.name.toLowerCase());
 
-      return matchName;
-    });
-
-    setSearchedMicrolocation(filteredMicrolocation);
-    setCurPage(1);
-  };
-
-  useEffect(() => {
-    handleSearch();
-    handleFetchCity();
-    setShowAll(searchTerm === "");
-  }, [updateTable, searchTerm]);
-  const handleCheckboxChange = async (event, micro) => {
+  const handleCheckboxChange = async (event, project) => {
     const { checked } = event.target;
 
     try {
-      const updatedMicrolocation = {
+      const updatedproject = {
         order: checked
-          ? microlocations.filter((micro) => micro.priority.is_active == true)
+          ? projects.filter((project) => project.plans_priority.is_active == true)
               .length + 1
           : 1000,
         is_active: checked,
-        cityId: selectedCity?.value,
+        plans_type: selectedPlanType?.value,
       };
 
       await axios.put(
-        `${BASE_URL}/api/microlocation/priority-microlocation/${micro._id}`,
-        updatedMicrolocation
+        `${BASE_URL}/api/project/plans-order/${project._id}`,
+        updatedproject
       );
-      micro.priority.is_active = checked;
-      setMicrolocations([...microlocations]);
-      handleFetchPriorityMicrolocation(selectedCity?.value);
+      project.plans_priority.is_active = checked;
+      setprojects([...projects]);
+      handleFetchTopProjects(selectedPlanType?.value);
     } catch (error) {
       console.error("An error occurred:", error);
     }
   };
-
   const onDragEnd = async (result) => {
     const { destination, source } = result;
 
-    if (!destination) return; // Dropped outside the list
-    if (destination.index === source.index) return; // Dropped in the same position
+    if (!destination) return;
+    if (destination.index === source.index) return;
 
-    const recordedMicro = Array.from(priorityMicrolocation);
-    const [movedSpace] = recordedMicro.splice(source.index, 1);
-    recordedMicro.splice(destination.index, 0, movedSpace);
+    const reorderedprojects = Array.from(priorityprojects);
+    const [movedproject] = reorderedprojects.splice(source.index, 1);
+    reorderedprojects.splice(destination.index, 0, movedproject);
 
-    // Create the payload with updated priority order for each coworking space
-    const updatedOrderPayload = recordedMicro.map((micro, index) => ({
-      _id: micro._id,
-      priority: {
+    const updatedOrderPayload = reorderedprojects.map((project, index) => ({
+      _id: project._id,
+      plans_priority: {
         order: index + 1,
       },
     }));
 
-    setPriorityMicrolocation(recordedMicro);
-
-    // Send API request to update the priority order on drag and drop
+    setPriorityprojects(reorderedprojects);
     try {
       const response = await axios.put(
-        `${BASE_URL}/api/microlocation/update-microlocation-priority`,
+        `${BASE_URL}/api/project/plans-priority`,
         updatedOrderPayload
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to update priority order.");
-      }
     } catch (error) {
       console.error("Error updating priority order:", error);
-      // Handle error (e.g., show an error message to the user)
     }
   };
-  console.log(priorityMicrolocation);
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
       <div className="table-box table_top_header">
-        <div className="table-top-box">Priority Location Module</div>
+        <div className="table-top-box">Projects Priority by Builder Module</div>
         <div className="row my-5">
           <div className="col-md-3">
             <Select
-              placeholder="City*"
-              value={selectedCity}
-              options={cityOptions}
+              placeholder="PlanTypes*"
+              value={selectedPlanType}
+              options={planTypesOptions}
               onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "city")
+                onChangeOptionHandler(selectedOption, "PlanType")
               }
               isSearchable
               required
@@ -204,7 +194,7 @@ function PriorityMicrolocation() {
       </div>
       <div className="table_container">
         <div className="table-box top_table_box1">
-          <div className="table-top-box">Location Module</div>
+          <div className="table-top-box">Projects Module</div>
           <TableContainer style={{ overflowX: "hidden" }}>
             <div className="row search_input">
               <div className="col-md-3">
@@ -228,67 +218,53 @@ function PriorityMicrolocation() {
                     <Thead>
                       <Tr className="table_heading_row">
                         <Th>Select</Th>
-                        <Th>Location</Th>
+                        <Th>Name</Th>
+                        <Th>MicroLocation</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
-                      {loadingAllMicro ? (
+                      {loading ? (
                         <Tr>
-                          <Td>
-                            <Spinner
-                              size="xl"
-                              w={20}
-                              h={20}
-                              alignSelf="center"
-                              style={{ position: "absolute", left: "482px" }}
-                            />
+                          <Td colSpan={8} textAlign="center">
+                            <Spinner size="lg" />
                           </Td>
                         </Tr>
-                      ) : showAll ? (
-                        microlocations
-                          .slice(
+                      ) : (showAll ? projects : searchedprojects)?.slice(
                             (curPage - 1) * selectItemNum,
                             curPage * selectItemNum
                           )
-                          .map((micro) => (
-                            <Tr key={micro._id}>
+
+                          .map((project) => (
+                            <Tr key={project._id}>
                               <Td>
                                 <input
                                   type="checkbox"
-                                  checked={micro.priority.is_active}
+                                  checked={project.plans_priority.is_active}
                                   onChange={(event) =>
-                                    handleCheckboxChange(event, micro)
+                                    handleCheckboxChange(event, project)
                                   }
                                 />
                               </Td>
-                              <Td>{micro?.name}</Td>
-                            </Tr>
-                          ))
-                      ) : searchedMicrolocation.length > 0 ? (
-                        searchedMicrolocation
-                          .slice(
-                            (curPage - 1) * selectItemNum,
-                            curPage * selectItemNum
-                          )
-                          .map((micro) => (
-                            <Tr key={micro._id}>
                               <Td>
-                                <input
-                                  type="checkbox"
-                                  checked={micro.priority.is_active}
-                                  onChange={(event) =>
-                                    handleCheckboxChange(event, micro)
-                                  }
-                                />
+                                {project?.name.length > 20
+                                  ? project?.name.slice(0, 15) + "..."
+                                  : project?.name}
                               </Td>
-                              <Td>{micro?.name}</Td>
+                              <Td>
+                                {project.location?.micro_location
+                                  ? project.location?.micro_location[0]?.name
+                                  : ""}
+                              </Td>
                             </Tr>
                           ))
-                      ) : (
-                        <Tr>
-                          <Td colSpan={8}>No matching results found.</Td>
-                        </Tr>
-                      )}
+                      
+                      }
+                      {(!loading && !((showAll ? projects : searchedprojects)
+  .slice((curPage - 1) * selectItemNum, curPage * selectItemNum).length)) && (
+  <Tr>
+    <Td colSpan={8}>No matching results found.</Td>
+  </Tr>
+)}
                     </Tbody>
                   </Table>
                 </div>
@@ -308,21 +284,24 @@ function PriorityMicrolocation() {
                   value={selectItemNum}
                   onChange={itemsPerPageHandler}
                 >
-                  <option value="5">5</option>
                   <option value="10">10</option>
-                  <option value="15">15</option>
                   <option value="20">20</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
                 </select>
               </div>
               <div style={{ width: "110px" }}>
                 {firstIndex + 1} -{" "}
                 {showAll
-                  ? microlocations.slice(
+                  ? projects.slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     ).length + firstIndex
-                  : searchedMicrolocation?.length}{" "}
-                of {microlocations?.length}
+                  : searchedprojects?.slice(
+                      (curPage - 1) * selectItemNum,
+                      curPage * selectItemNum
+                    ).length + firstIndex}{" "}
+                of {showAll ? projects?.length : searchedprojects.length}
               </div>
 
               <div className="page-item">
@@ -341,7 +320,7 @@ function PriorityMicrolocation() {
           </nav>
         </div>
         <div className="table-box top_table_box2">
-          <div className="table-top-box">Top Priority Location Module</div>
+          <div className="table-top-box">Priority Projects Module</div>
           <TableContainer style={{ overflowX: "hidden" }}>
             <div className="data_table">
               <div className="row">
@@ -355,23 +334,23 @@ function PriorityMicrolocation() {
                     </Thead>
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                      <Droppable droppableId="microlocations">
+                      <Droppable droppableId="projectss">
                         {(provided) => (
                           <Tbody
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                           >
-                            {loadingMicro ? (
+                            {loadingTable ? (
                               <Tr>
                                 <Td colSpan={3} textAlign="center">
                                   <Spinner size="lg" />
                                 </Td>
                               </Tr>
                             ) : (
-                              priorityMicrolocation.map((micro, index) => (
+                              priorityprojects.map((project, index) => (
                                 <Draggable
-                                  key={micro._id}
-                                  draggableId={micro._id}
+                                  key={project._id}
+                                  draggableId={project._id}
                                   index={index}
                                 >
                                   {(provided) => (
@@ -383,7 +362,7 @@ function PriorityMicrolocation() {
                                         {index + 1}
                                       </Td>
                                       <Td {...provided.dragHandleProps}>
-                                        {micro?.name}
+                                        {project?.name}
                                       </Td>
                                     </Tr>
                                   )}
@@ -406,4 +385,4 @@ function PriorityMicrolocation() {
   );
 }
 
-export default PriorityMicrolocation;
+export default BuilderPriority;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState, convertToRaw, ContentState } from "draft-js";
+import { EditorState, convertToRaw, ContentState, Modifier } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import { GpState } from "../../../context/context";
@@ -21,7 +21,37 @@ const ProjectEditor = () => {
   const onEditorStateChange2 = (editorState) => {
     setEditorState2(editorState);
   };
+  const handlePastedText = (text, html, editorState) => {
+    const plainText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+    const contentState = ContentState.createFromText(plainText);
+    const newContentState = Modifier.replaceWithFragment(
+      editorState.getCurrentContent(),
+      editorState.getSelection(),
+      contentState.getBlockMap()
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-fragment"
+    );
+    setEditorState(newEditorState);
+  };
 
+  const handlePastedText2 = (text, html, editorState) => {
+    const plainText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+    const contentState = ContentState.createFromText(plainText);
+    const newContentState = Modifier.replaceWithFragment(
+      editorState.getCurrentContent(),
+      editorState.getSelection(),
+      contentState.getBlockMap()
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-fragment"
+    );
+    setEditorState2(newEditorState);
+  };
   useEffect(() => {
     if (editProject?.description && isEditable) {
       const blocksFromHtml = htmlToDraft(editProject?.description || "empty");
@@ -79,6 +109,7 @@ const ProjectEditor = () => {
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
+            handlePastedText={handlePastedText}
             onEditorStateChange={onEditorStateChange}
           />
         </div>
@@ -93,6 +124,7 @@ const ProjectEditor = () => {
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
+            handlePastedText={handlePastedText2}
             onEditorStateChange={onEditorStateChange2}
           />
         </div>
