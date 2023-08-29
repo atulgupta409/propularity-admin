@@ -15,6 +15,10 @@ import { FiCheckSquare } from "react-icons/fi";
 const Desable = ({ handleFunction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
+  const handleApprove = () => {
+    handleFunction();
+    onClose()
+  }
   return (
     <>
       <FiCheckSquare
@@ -41,7 +45,7 @@ const Desable = ({ handleFunction }) => {
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleFunction} ml={3}>
+              <Button colorScheme="red" onClick={handleApprove} ml={3}>
                 Approve
               </Button>
             </AlertDialogFooter>

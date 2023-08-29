@@ -20,12 +20,14 @@ import AddSeoForm from "./components/SEO/AddSeoForm";
 import EditSeo from "./components/SEO/EditSeo";
 import ImageUpload from "./ImageUpload";
 import OurClient from "./components/ourClients/OurClient";
-// import TopPrioritySpace from "./components/prioritySpace/TopPrioritySpace";
-// import PriorityMicrolocation from "./components/priorityMicrolocation/PriorityMicrolocation";
-// import PopularSpace from "./components/popularSpaces/PopularSpace";
+import PriorityProjects from "./components/priorityProjects/PriorityProjects"
+import PriorityMicrolocation from "./components/priorityMicrolocation/PriorityMicrolocation";
+import TopProjects from "./components/top-projects/TopProjects";
 import ForgotPassword from "./components/login-page/ForgotPassword";
 import PasswordReset from "./components/login-page/PasswordReset";
 import AddBuilder from "./components/builders/addbuilders/AddBuilder";
+import BuilderPriority from "./components/builder-priority/BuilderPriority";
+import PlansPriority from "./components/plans-priority/PlansPriority"
 function App() {
   const { isLogin } = GpState();
   return (
@@ -119,20 +121,28 @@ function App() {
                 path="/clients"
                 element={isLogin ? <OurClient /> : <Navigate to="/" />}
               />
-              {/* <Route
+              <Route
                 path="/priority"
-                element={isLogin ? <TopPrioritySpace /> : <Navigate to="/" />}
-              /> */}
-              {/* <Route
+                element={isLogin ? <PriorityProjects /> : <Navigate to="/" />}
+              />
+              <Route
                 path="/priority-microlocation"
                 element={
                   isLogin ? <PriorityMicrolocation /> : <Navigate to="/" />
                 }
-              /> */}
-              {/* <Route
-                path="/popular-spaces"
-                element={isLogin ? <PopularSpace /> : <Navigate to="/" />}
-              /> */}
+              />
+              <Route
+                path="/top-projects"
+                element={isLogin ? <TopProjects /> : <Navigate to="/" />}
+              />
+                <Route
+                path="/builder-priority"
+                element={isLogin ? <BuilderPriority /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/plans-priority"
+                element={isLogin ? <PlansPriority /> : <Navigate to="/" />}
+              />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route
                 path="/forgotpassword/:id/:token"

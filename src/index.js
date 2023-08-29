@@ -8,6 +8,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import AppProvider from "./context/context";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { ApolloProvider } from '@apollo/client';
+import client from './client';
 
 axios.interceptors.request.use((request) => {
   request.headers.Authorization = `Bearer ${Cookies.get("token")}`;
@@ -21,11 +23,13 @@ axios.interceptors.response.use((response) => {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
+  <ApolloProvider client={client}>
     <AppProvider>
       <ChakraProvider>
         <App />
       </ChakraProvider>
     </AppProvider>
+    </ApolloProvider>
   </BrowserRouter>
 );
 

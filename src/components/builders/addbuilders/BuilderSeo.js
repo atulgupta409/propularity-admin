@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { EditorState, convertToRaw, ContentState } from "draft-js";
+import { EditorState, convertToRaw, ContentState, Modifier } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
@@ -12,6 +12,7 @@ const BuilderSeo = () => {
     editBuilder,
     isBuilderEditable,
     setFooter_des,
+    footer_des
   } = GpState();
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const handleInputChange = (e) => {
@@ -35,6 +36,7 @@ const BuilderSeo = () => {
   const onEditorStateChange = (editorState) => {
     setEditorState(editorState);
   };
+  console.log(footer_des)
   useEffect(() => {
     if (editBuilder?.description && isBuilderEditable) {
       const blocks = htmlToDraft(editBuilder?.description || "empty");
@@ -83,6 +85,21 @@ const BuilderSeo = () => {
       });
     }
   }, [editBuilder]);
+  const handlePastedText = (text, html, editorState) => {
+    const plainText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+    const contentState = ContentState.createFromText(plainText);
+    const newContentState = Modifier.replaceWithFragment(
+      editorState.getCurrentContent(),
+      editorState.getSelection(),
+      contentState.getBlockMap()
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-fragment"
+    );
+    setEditorState(newEditorState);
+  };
   return (
     <>
       <div className="row mt-5">
@@ -240,6 +257,7 @@ const BuilderSeo = () => {
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
+            handlePastedText={handlePastedText}
             onEditorStateChange={onEditorStateChange}
           />
         </div>

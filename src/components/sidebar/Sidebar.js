@@ -96,44 +96,55 @@ function Sidebar() {
                 Project Types
               </NavLink>
             </li>
-            {/* <li className="nav-item">
+            <li className="nav-item">
               <NavLink to="/priority">
                 <HiOutlineBuildingOffice className="icon" />
-                Top Priority Space
+                Projects Priority
               </NavLink>
-            </li> */}
-            {/* <li className="nav-item">
-              <NavLink to="/popular-spaces">
+            </li>
+            <li className="nav-item">
+              <NavLink to="/top-projects">
                 <HiOutlineBuildingOffice className="icon" />
-                Popular Spaces
+                Top Projects
               </NavLink>
-            </li> */}
-
-            {/* <li className="nav-item">
+            </li>
+            <li className="nav-item">
+              <NavLink to="/builder-priority">
+                <HiOutlineBuildingOffice className="icon" />
+                Builder Priority
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/plans-priority">
+                <HiOutlineBuildingOffice className="icon" />
+                Plans Priority
+              </NavLink>
+            </li>
+            <li className="nav-item">
               <NavLink to="/priority-microlocation">
                 <IoLocationOutline className="icon" />
-                Priority Location
+               Location Priority 
               </NavLink>
-            </li> */}
+            </li>
             <li className="nav-item">
               <NavLink to="/builder">
                 <MdOutlineRealEstateAgent className="icon" />
                 Builder
               </NavLink>
             </li>
-            {/* <li className="nav-item">
+           <li className="nav-item">
               <NavLink to="/seo">
                 <MdOutlineRealEstateAgent className="icon" />
                 SEO
               </NavLink>
             </li>
 
-            <li className="nav-item">
+             <li className="nav-item">
               <NavLink to="/media">
                 <MdOutlinePermMedia className="icon" />
                 Media
               </NavLink>
-            </li> */}
+            </li>
             <li className="nav-item">
               <NavLink to="/country">
                 <IoEarthOutline className="icon" />

@@ -21,6 +21,7 @@ const Location = () => {
     setLocation,
     isEditable,
     editProject,
+    allLocation, setAllLocation
   } = GpState();
   const [microlocations, setMicrolocations] = useState([]);
   const [cities, setCities] = useState([]);
@@ -81,6 +82,7 @@ const Location = () => {
         break;
     }
   };
+  const locations = selectedMicroLocation?.map((city) => city.value);
   const microLocationOptions = microlocations?.map((microLocation) => ({
     value: microLocation._id,
     label: microLocation.name,
@@ -136,19 +138,16 @@ const Location = () => {
       setSelectedCity(null);
     }
   }, [cities]);
-  useEffect(() => {
-    const initialMicroLocation = microLocationOptions.find(
-      (option) => option.value === editProject?.location?.micro_location
-    );
-    if (initialMicroLocation && isEditable) {
-      setSelectedMicroLocation(initialMicroLocation);
-    } else {
-      setSelectedMicroLocation(null);
-    }
-  }, [microlocations]);
+
   useEffect(() => {
     handleFetchCountry();
   }, []);
+  useEffect(() => {
+    if(locations){
+      setAllLocation(locations)
+    }
+  },[selectedMicroLocation])
+
   useEffect(() => {
     if (editProject && isEditable) {
       setLocation({
@@ -166,10 +165,22 @@ const Location = () => {
       });
     }
   }, [editProject]);
+
+  useEffect(() => {
+    const initialLocation = microLocationOptions.filter((option) =>
+    editProject?.location?.micro_location?.includes(option.value)
+    );
+   
+    if (initialLocation && isEditable) {
+      setSelectedMicroLocation(initialLocation);
+    } else {
+      setSelectedMicroLocation(null);
+    }
+  }, [microlocations]);
   useEffect(() => {
     handleFetchCountry();
   }, []);
-  console.log(selectedState);
+
   return (
     <>
       <div className="row top-margin">
@@ -190,7 +201,7 @@ const Location = () => {
         </div>
       </div>
       <div className="row mt-4">
-        <div className="col-md-3">
+        <div className="col-md-4">
           <div>
             <Select
               placeholder="Country*"
@@ -204,7 +215,7 @@ const Location = () => {
             />
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-4">
           <div>
             <Select
               placeholder="State*"
@@ -219,7 +230,7 @@ const Location = () => {
             />
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-4">
           <div>
             <Select
               placeholder="City*"
@@ -233,7 +244,10 @@ const Location = () => {
             />
           </div>
         </div>
-        <div className="col-md-3">
+       
+        </div>
+        <div className="row mt-4">
+        <div className="col-md-6">
           <div>
             <Select
               placeholder="Location*"
@@ -242,10 +256,12 @@ const Location = () => {
               onChange={(selectedOption) =>
                 onChangeOptionHandler(selectedOption, "microLocation")
               }
+              isMulti
               isSearchable
               required
             />
           </div>
+        </div>
         </div>
         <div className="row mt-4 mb-4">
           <div className="col-md-3">
@@ -279,7 +295,7 @@ const Location = () => {
             </div>
           </div>
         </div>
-      </div>
+     
       <div className="row mt-4">
         <div className="col-md-12">
           <h4 className="property_form_h4">Metro Details</h4>

@@ -5,11 +5,7 @@ import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { AiOutlineEye } from "react-icons/ai";
-import {
-  changeProjectStatus,
-  deleteprojects,
-  getProjectData,
-} from "./ProjectService";
+import { changeProjectStatus } from "./ProjectService";
 import {
   Table,
   Thead,
@@ -21,13 +17,37 @@ import {
   Spinner,
   useToast,
 } from "@chakra-ui/react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import Delete from "../delete/Delete";
 import { AiFillEdit } from "react-icons/ai";
 import Desable from "../delete/Desable";
 import Approve from "../delete/Approve";
-function CoworkingSpace() {
-  const [loading, setLoading] = useState(false);
+import BASE_URL from "../../apiConfig";
+import { useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+const GET_PROJECTS = gql`
+  query {
+    projects {
+        _id 
+      name
+      slug
+      location{
+        city{
+          name
+        }
+        micro_location{
+          name
+        }
+      }
+      status
+      createdAt
+    }
+  }
+`;
+
+function BuilderProjects() {
+  const { loading, error, data } = useQuery(GET_PROJECTS);
   const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,17 +57,17 @@ function CoworkingSpace() {
   const [showAll, setShowAll] = useState(true);
   const [searchOption, setSearchOption] = useState("");
 
-  const toast = useToast();
-
-  const handleFetchproject = async () => {
-    await getProjectData(setLoading, setprojects);
-  };
-
+  const toast = useToast()
+  useEffect(() => {
+    if(data?.projects){
+      setprojects(data?.projects)
+    }
+  }, [data?.projects]);   
   const handleSearch = () => {
-    const filteredprojects = projects.filter((project) => {
-      const cityName = project.location.city?.name || "city";
+    const filteredprojects = projects?.filter((project) => {
+      const cityName = project.location.city[0]?.name || "city";
       const microLocationName =
-        project.location.micro_location?.name || "microlocation";
+        project.location.micro_location[0]?.name || "microlocation";
       const statusName = project.status;
       const matchName =
         project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,7 +96,6 @@ function CoworkingSpace() {
   };
 
   useEffect(() => {
-    handleFetchproject();
     handleSearch();
     setShowAll(
       searchTerm === "" &&
@@ -92,7 +111,28 @@ function CoworkingSpace() {
     searchOption,
   ]);
   const handleDeleteprojects = async (id) => {
-    await deleteprojects(id, toast, setUpdateTable);
+    try {
+      const { data } = await axios.delete(
+        `${BASE_URL}/api/project/delete/${id}`
+      );
+      setUpdateTable((prev) => !prev);
+      toast({
+        title: "Deleted Successfully!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
   };
 
   const handleApprove = async (id) => {
@@ -118,7 +158,7 @@ function CoworkingSpace() {
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? projects.length : searchedprojects?.length) / selectItemNum
+    (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
   );
   if (firstIndex > 0) {
     var prePage = () => {
@@ -130,7 +170,7 @@ function CoworkingSpace() {
 
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? projects.length : searchedprojects.length) / selectItemNum
+      (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -147,14 +187,11 @@ function CoworkingSpace() {
   return (
     <div className="mx-5 mt-3">
       <Mainpanelnav />
-      <Link
-        to="/builder-projects/add-builder-projects"
-        className="btnLink mt-2"
-      >
-        <Addpropertybtn buttonText={"ADD PROJECT"} />
+      <Link to="/builder-projects/add-builder-projects" className="btnLink mt-2">
+        <Addpropertybtn buttonText={"ADD Project"} />
       </Link>
       <div className="table-box space-table-box">
-        <div className="table-top-box">Builder Projects Module</div>
+        <div className="table-top-box">Projects Module</div>
         <TableContainer overflowX="hidden">
           <div className="row my-5">
             <div className="col-md-3">
@@ -221,7 +258,7 @@ function CoworkingSpace() {
                 <Table variant="simple">
                   <Thead>
                     <Tr className="table_heading_row">
-                      <Th className="name_heading">NAME OF PROJECT</Th>
+                      <Th className="name_heading">NAME</Th>
                       <Th className="city_heading">CITY</Th>
                       <Th className="micro_heading">LOCATION</Th>
                       <Th className="time_heading">ADDED ON</Th>
@@ -233,192 +270,82 @@ function CoworkingSpace() {
                   </Thead>
                   <Tbody>
                     {loading ? (
-                      <Tr>
-                        <Td colSpan={8} textAlign="center">
-                          <Spinner size="lg" />
-                        </Td>
-                      </Tr>
-                    ) : showAll ? (
-                      projects
-                        ?.slice(
-                          (curPage - 1) * selectItemNum,
-                          curPage * selectItemNum
-                        )
-
-                        .map((project) => (
-                          <Tr className="table_data_row" key={project._id}>
-                            <Td className="name_heading">{project.name}</Td>
-                            <Td className="city_heading">
-                              {project.location.city
-                                ? project.location.city.name
-                                : ""}
-                            </Td>
-                            <Td className="micro_heading">
-                              {project.location.micro_location
-                                ? project.location.micro_location.name
-                                : ""}
-                            </Td>
-
-                            <Td className="time_heading">
-                              {new Intl.DateTimeFormat("en-GB", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              }).format(new Date(project.createdAt))}
-                            </Td>
-                            <Td className="status_heading" textAlign="center">
-                              {project.status === "approve"
-                                ? "AP"
-                                : project.status === "reject"
-                                ? "RJ"
-                                : project.status === "pending"
-                                ? "PD"
-                                : ""}
-                            </Td>
-                            <Td className="edit_heading">
-                              <Link
-                                to={`/builder-projects/edit-project/${project._id}`}
-                              >
-                                <AiFillEdit
-                                  style={{
-                                    marginLeft: "0.5rem",
-                                    fontSize: "20px",
-                                  }}
-                                />
-                              </Link>
-                            </Td>
-                            <Td className="preview_heading">
-                              <Link
-                                to={`https://spacite.com/coworking/${project.slug}`}
-                                target="_blank"
-                              >
-                                <AiOutlineEye
-                                  style={{
-                                    margin: "auto",
-                                    fontSize: "20px",
-                                    cursor: "pointer",
-                                  }}
-                                />
-                              </Link>
-                            </Td>
-                            <Td className="action_heading">
-                              <div
-                                className="d-flex justify-content-between align-items-center"
-                                style={{ width: "100px !important" }}
-                              >
-                                <Approve
-                                  handleFunction={() =>
-                                    handleApprove(project._id)
-                                  }
-                                />
-                                <Desable
-                                  handleFunction={() =>
-                                    handleReject(project._id)
-                                  }
-                                />
-
-                                <Delete
-                                  handleFunction={() =>
-                                    handleDeleteprojects(project._id)
-                                  }
-                                />
-                              </div>
-                            </Td>
-                          </Tr>
-                        ))
-                    ) : searchedprojects.length > 0 ? (
-                      searchedprojects
-                        .slice(
-                          (curPage - 1) * selectItemNum,
-                          curPage * selectItemNum
-                        )
-
-                        .map((project, index) => (
-                          <Tr className="table_data_row" key={project._id}>
-                            <Td className="name_heading">{project.name}</Td>
-                            <Td className="city_heading">
-                              {project.location.city
-                                ? project.location.city.name
-                                : ""}
-                            </Td>
-                            <Td className="micro_heading">
-                              {project.location.micro_location
-                                ? project.location.micro_location.name
-                                : ""}
-                            </Td>
-
-                            <Td className="time_heading">
-                              {new Intl.DateTimeFormat("en-GB", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              }).format(new Date(project.createdAt))}
-                            </Td>
-                            <Td className="status_heading" textAlign="center">
-                              {project.status === "approve"
-                                ? "AP"
-                                : project.status === "reject"
-                                ? "RJ"
-                                : project.status === "pending"
-                                ? "PD"
-                                : ""}
-                            </Td>
-                            <Td className="edit_heading">
-                              <Link
-                                to={`/builder-projects/edit-project/${project._id}`}
-                              >
-                                <AiFillEdit
-                                  style={{
-                                    marginLeft: "0.5rem",
-                                    fontSize: "20px",
-                                  }}
-                                />
-                              </Link>
-                            </Td>
-                            <Td className="preview_heading">
-                              <Link
-                                to={`https://spacite.com/coworking/${project.slug}`}
-                                target="_blank"
-                              >
-                                <AiOutlineEye
-                                  style={{
-                                    margin: "auto",
-                                    fontSize: "20px",
-                                    cursor: "pointer",
-                                  }}
-                                />
-                              </Link>
-                            </Td>
-                            <Td className="action_heading">
-                              <div
-                                className="d-flex justify-content-between align-items-center main-div"
-                                style={{ width: "100px !important" }}
-                              >
-                                <Approve
-                                  handleFunction={() =>
-                                    handleApprove(project._id)
-                                  }
-                                />
-                                <Desable
-                                  handleFunction={() =>
-                                    handleReject(project._id)
-                                  }
-                                />
-
-                                <Delete
-                                  handleFunction={() =>
-                                    handleDeleteprojects(project._id)
-                                  }
-                                />
-                              </div>
-                            </Td>
-                          </Tr>
-                        ))
-                    ) : (
-                      <Tr>
-                        <Td colSpan={8}>No matching results found.</Td>
-                      </Tr>
-                    )}
+  <Tr>
+    <Td colSpan={8} textAlign="center">
+      <Spinner size="lg" />
+    </Td>
+  </Tr>
+) : (
+  (showAll ? projects : searchedprojects)
+    .slice((curPage - 1) * selectItemNum, curPage * selectItemNum)
+    .map((project) => (
+      <Tr className="table_data_row" key={project._id}>
+        <Td className="name_heading">{project.name}</Td>
+        <Td className="city_heading">{project.location.city[0]?.name}</Td>
+        <Td className="micro_heading">
+          {project.location.micro_location[0]?.name}
+        </Td>
+        <Td className="time_heading">
+          {new Intl.DateTimeFormat("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(project.createdAt))}
+        </Td>
+        <Td className="status_heading" textAlign="center">
+          {project.status === "approve"
+            ? "AP"
+            : project.status === "reject"
+            ? "RJ"
+            : project.status === "pending"
+            ? "PD"
+            : ""}
+        </Td>
+        <Td className="edit_heading">
+          <Link
+            to={`/builder-projects/edit-project/${project._id}`}
+          >
+            <AiFillEdit
+              style={{
+                marginLeft: "0.5rem",
+                fontSize: "20px",
+              }}
+            />
+          </Link>
+        </Td>
+        <Td className="preview_heading">
+          <Link
+            to={`https://spacite.com/coworking/${project.slug}`}
+            target="_blank"
+          >
+            <AiOutlineEye
+              style={{
+                margin: "auto",
+                fontSize: "20px",
+                cursor: "pointer",
+              }}
+            />
+          </Link>
+        </Td>
+        <Td className="action_heading">
+          <div
+            className="d-flex justify-content-between align-items-center main-div"
+            style={{ width: "100px !important" }}
+          >
+            <Approve handleFunction={() => handleApprove(project._id)} />
+            <Desable handleFunction={() => handleReject(project._id)} />
+            <Delete handleFunction={() => handleDeleteprojects(project._id)} />
+          </div>
+        </Td>
+      </Tr>
+    ))
+)}
+{(!loading && !((showAll ? projects : searchedprojects)
+  .slice((curPage - 1) * selectItemNum, curPage * selectItemNum).length)) && (
+  <Tr>
+    <Td colSpan={8}>No matching results found.</Td>
+  </Tr>
+)}
                   </Tbody>
                 </Table>
               </div>
@@ -447,7 +374,7 @@ function CoworkingSpace() {
             <div style={{ width: "110px" }}>
               {firstIndex + 1} -{" "}
               {showAll
-                ? projects.slice(
+                ? projects?.slice(
                     (curPage - 1) * selectItemNum,
                     curPage * selectItemNum
                   ).length + firstIndex
@@ -455,7 +382,7 @@ function CoworkingSpace() {
                     (curPage - 1) * selectItemNum,
                     curPage * selectItemNum
                   ).length + firstIndex}{" "}
-              of {showAll ? projects?.length : searchedprojects.length}
+              of {showAll ? projects?.length : searchedprojects?.length}
             </div>
 
             <div className="page-item">
@@ -477,4 +404,4 @@ function CoworkingSpace() {
   );
 }
 
-export default CoworkingSpace;
+export default BuilderProjects;

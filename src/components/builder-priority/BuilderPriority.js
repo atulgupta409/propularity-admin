@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Mainpanelnav from "../mainpanel-header/Mainpanelnav";
-import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import {
@@ -12,93 +11,78 @@ import {
   Td,
   TableContainer,
   Spinner,
-  useToast,
 } from "@chakra-ui/react";
-import "./TopPriority.css";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { getMicrolocationByCity } from "../builder-projects/WorkSpaceService";
-import { getCity } from "../brands/BrandService";
+import { getbuilder } from "../builders/BuilderService";
 import Select from "react-select";
-import {
-  getWorkSpaceDataByMicrolocation,
-  getWorkSpaceDataByMicrolocationWithPriority,
-} from "./TopPriorityService";
 import BASE_URL from "../../apiConfig";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-function TopPrioritySpace() {
+import {
+  getTopProjectsByBuilder,
+  getProjectsDataByBuilder,
+} from "./BuilderPriorityService";
+import { getBuilderData } from "../builder-projects/ProjectService";
+function BuilderPriority() {
   const [loading, setLoading] = useState(false);
-  const [workSpaces, setWorkSpaces] = useState([]);
+  const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchedWorkSpaces, setSearchedWorkSpaces] = useState([]);
+  const [searchedprojects, setSearchedprojects] = useState([]);
   const [showAll, setShowAll] = useState(true);
-  const [cities, setCities] = useState([]);
-  const [microlocations, setMicrolocations] = useState([]);
-  const toast = useToast();
-  const [selectedMicroLocation, setSelectedMicroLocation] = useState(null);
-  const [selectedCity, setSelectedCity] = useState(null);
-  const [priorityWorkSpaces, setPriorityWorkSpaces] = useState([]);
+  const [builders, setBuilders] = useState([]);
+  const [selectedBuilder, setSelectedBuilder] = useState(null);
+  const [priorityprojects, setPriorityprojects] = useState([]);
   const [loadingTable, setLoadingTable] = useState(false);
-  const handleFetchCity = async () => {
-    await getCity(setCities);
+  const handleFetchBuilder = async () => {
+    await getBuilderData(setBuilders);
   };
-  const handleFetchMicrolocation = async (cityId) => {
-    await getMicrolocationByCity(cityId, setMicrolocations);
-  };
-  const handleFetchWorkSpaceData = async (id) => {
-    await getWorkSpaceDataByMicrolocation(setLoading, setWorkSpaces, id);
+  const handleFetchProjects = async (builderId) => {
+    setLoading(true)
+  const data = await getProjectsDataByBuilder(builderId);
+  setprojects(data)
+  setLoading(false)
     setSearchTerm("");
   };
-  const handleFetchPriorityWorkspaces = async (id) => {
-    await getWorkSpaceDataByMicrolocationWithPriority(
-      setLoadingTable,
-      setPriorityWorkSpaces,
-      id
-    );
+  const handleFetchTopProjects = async (builderId) => {
+    setLoadingTable(true)
+    const data = await getTopProjectsByBuilder(builderId)
+    setPriorityprojects(data)
+    setLoadingTable(false)
   };
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
-      case "city":
-        setSelectedCity(selectedOption);
+      case "builder":
+        setSelectedBuilder(selectedOption);
 
-        handleFetchMicrolocation(selectedOption ? selectedOption.value : null);
-        break;
-      case "microLocation":
-        setSelectedMicroLocation(selectedOption);
-        handleFetchWorkSpaceData(selectedOption ? selectedOption.value : "");
-        handleFetchPriorityWorkspaces(
-          selectedOption ? selectedOption.value : ""
+        handleFetchProjects(selectedOption ? selectedOption.value : null);
+        handleFetchTopProjects(
+          selectedOption ? selectedOption.value : null
         );
         break;
       default:
         break;
     }
   };
-  const microLocationOptions = microlocations?.map((microLocation) => ({
-    value: microLocation._id,
-    label: microLocation.name,
-  }));
-  const cityOptions = cities?.map((city) => ({
-    value: city._id,
-    label: city.name,
+  const builderOptions = builders?.map((builder) => ({
+    value: builder._id,
+    label: builder.name,
   }));
 
   const handleSearch = () => {
-    const filteredWorkSpaces = workSpaces.filter((workSpace) => {
+    const filteredprojects = projects.filter((workproject) => {
       const matchName =
-        workSpace.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(workSpace.name.toLowerCase());
+        workproject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        searchTerm.toLowerCase().includes(workproject.name.toLowerCase());
       return matchName;
     });
 
-    setSearchedWorkSpaces(filteredWorkSpaces);
+    setSearchedprojects(filteredprojects);
     setCurPage(1);
   };
 
   useEffect(() => {
     handleSearch();
-    handleFetchCity();
+    handleFetchBuilder();
     setShowAll(searchTerm === "");
   }, [updateTable, searchTerm]);
 
@@ -111,7 +95,7 @@ function TopPrioritySpace() {
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? workSpaces?.length : searchedWorkSpaces?.length) / selectItemNum
+    (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
   );
   if (firstIndex > 0) {
     var prePage = () => {
@@ -122,8 +106,7 @@ function TopPrioritySpace() {
   }
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? workSpaces?.length : searchedWorkSpaces?.length) /
-        selectItemNum
+      (showAll ? projects.length : searchedprojects.length) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -138,26 +121,26 @@ function TopPrioritySpace() {
     setCurPage(nPage);
   };
 
-  const handleCheckboxChange = async (event, coworkingSpace) => {
+  const handleCheckboxChange = async (event, project) => {
     const { checked } = event.target;
 
     try {
-      const updatedSpace = {
+      const updatedproject = {
         order: checked
-          ? workSpaces.filter((space) => space.priority.is_active == true)
+          ? projects.filter((project) => project.builder_priority.is_active == true)
               .length + 1
           : 1000,
         is_active: checked,
-        microlocationId: selectedMicroLocation?.value,
+        builder: selectedBuilder?.value,
       };
 
       await axios.put(
-        `${BASE_URL}/api/workSpace/coworkingspaces/${coworkingSpace._id}`,
-        updatedSpace
+        `${BASE_URL}/api/project/builder-order/${project._id}`,
+        updatedproject
       );
-      coworkingSpace.priority.is_active = checked;
-      setWorkSpaces([...workSpaces]);
-      handleFetchPriorityWorkspaces(selectedMicroLocation?.value);
+      project.builder_priority.is_active = checked;
+      setprojects([...projects]);
+      handleFetchTopProjects(selectedBuilder?.value);
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -168,27 +151,23 @@ function TopPrioritySpace() {
     if (!destination) return;
     if (destination.index === source.index) return;
 
-    const reorderedSpaces = Array.from(priorityWorkSpaces);
-    const [movedSpace] = reorderedSpaces.splice(source.index, 1);
-    reorderedSpaces.splice(destination.index, 0, movedSpace);
+    const reorderedprojects = Array.from(priorityprojects);
+    const [movedproject] = reorderedprojects.splice(source.index, 1);
+    reorderedprojects.splice(destination.index, 0, movedproject);
 
-    const updatedOrderPayload = reorderedSpaces.map((space, index) => ({
-      _id: space._id,
-      priority: {
+    const updatedOrderPayload = reorderedprojects.map((project, index) => ({
+      _id: project._id,
+      builder_priority: {
         order: index + 1,
       },
     }));
 
-    setPriorityWorkSpaces(reorderedSpaces);
+    setPriorityprojects(reorderedprojects);
     try {
       const response = await axios.put(
-        `${BASE_URL}/api/workSpace/update-priority`,
+        `${BASE_URL}/api/project/builder-priority`,
         updatedOrderPayload
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to update priority order.");
-      }
     } catch (error) {
       console.error("Error updating priority order:", error);
     }
@@ -197,39 +176,25 @@ function TopPrioritySpace() {
     <div className="mx-5 mt-3">
       <Mainpanelnav />
       <div className="table-box table_top_header">
-        <div className="table-top-box">Priority Coworking Spaces Module</div>
+        <div className="table-top-box">Projects Priority by Builder Module</div>
         <div className="row my-5">
           <div className="col-md-3">
             <Select
-              placeholder="City*"
-              value={selectedCity}
-              options={cityOptions}
+              placeholder="builder*"
+              value={selectedBuilder}
+              options={builderOptions}
               onChange={(selectedOption) =>
-                onChangeOptionHandler(selectedOption, "city")
+                onChangeOptionHandler(selectedOption, "builder")
               }
               isSearchable
               required
             />
           </div>
-          <div className="col-md-3">
-            <div className="drop_down_box">
-              <Select
-                placeholder="Microlocation*"
-                value={selectedMicroLocation}
-                options={microLocationOptions}
-                onChange={(selectedOption) =>
-                  onChangeOptionHandler(selectedOption, "microLocation")
-                }
-                isSearchable
-                required
-              />
-            </div>
-          </div>
         </div>
       </div>
       <div className="table_container">
         <div className="table-box top_table_box1">
-          <div className="table-top-box">Coworking Spaces Module</div>
+          <div className="table-top-box">Projects Module</div>
           <TableContainer style={{ overflowX: "hidden" }}>
             <div className="row search_input">
               <div className="col-md-3">
@@ -254,8 +219,7 @@ function TopPrioritySpace() {
                       <Tr className="table_heading_row">
                         <Th>Select</Th>
                         <Th>Name</Th>
-
-                        <Th>Location</Th>
+                        <Th>MicroLocation</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -265,65 +229,42 @@ function TopPrioritySpace() {
                             <Spinner size="lg" />
                           </Td>
                         </Tr>
-                      ) : showAll ? (
-                        workSpaces
-                          ?.slice(
+                      ) : (showAll ? projects : searchedprojects)?.slice(
                             (curPage - 1) * selectItemNum,
                             curPage * selectItemNum
                           )
 
-                          .map((space) => (
-                            <Tr key={space._id}>
+                          .map((project) => (
+                            <Tr key={project._id}>
                               <Td>
                                 <input
                                   type="checkbox"
-                                  checked={space.priority.is_active}
+                                  checked={project.builder_priority.is_active}
                                   onChange={(event) =>
-                                    handleCheckboxChange(event, space)
+                                    handleCheckboxChange(event, project)
                                   }
                                 />
                               </Td>
-                              <Td>{space?.name}</Td>
-
                               <Td>
-                                {space.location.micro_location
-                                  ? space.location.micro_location.name
+                                {project?.name.length > 20
+                                  ? project?.name.slice(0, 15) + "..."
+                                  : project?.name}
+                              </Td>
+                              <Td>
+                                {project.location?.micro_location
+                                  ? project.location?.micro_location[0]?.name
                                   : ""}
                               </Td>
                             </Tr>
                           ))
-                      ) : searchedWorkSpaces.length > 0 ? (
-                        searchedWorkSpaces
-                          .slice(
-                            (curPage - 1) * selectItemNum,
-                            curPage * selectItemNum
-                          )
-
-                          .map((space, index) => (
-                            <Tr key={space._id}>
-                              <Td>
-                                <input
-                                  type="checkbox"
-                                  checked={space.priority.is_active}
-                                  onChange={(event) =>
-                                    handleCheckboxChange(event, space)
-                                  }
-                                />
-                              </Td>
-                              <Td>{space?.name}</Td>
-
-                              <Td>
-                                {space.location.micro_location
-                                  ? space.location.micro_location.name
-                                  : ""}
-                              </Td>
-                            </Tr>
-                          ))
-                      ) : (
-                        <Tr>
-                          <Td colSpan={8}>No matching results found.</Td>
-                        </Tr>
-                      )}
+                      
+                      }
+                      {(!loading && !((showAll ? projects : searchedprojects)
+  .slice((curPage - 1) * selectItemNum, curPage * selectItemNum).length)) && (
+  <Tr>
+    <Td colSpan={8}>No matching results found.</Td>
+  </Tr>
+)}
                     </Tbody>
                   </Table>
                 </div>
@@ -352,15 +293,15 @@ function TopPrioritySpace() {
               <div style={{ width: "110px" }}>
                 {firstIndex + 1} -{" "}
                 {showAll
-                  ? workSpaces.slice(
+                  ? projects.slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     ).length + firstIndex
-                  : searchedWorkSpaces?.slice(
+                  : searchedprojects?.slice(
                       (curPage - 1) * selectItemNum,
                       curPage * selectItemNum
                     ).length + firstIndex}{" "}
-                of {showAll ? workSpaces?.length : searchedWorkSpaces.length}
+                of {showAll ? projects?.length : searchedprojects.length}
               </div>
 
               <div className="page-item">
@@ -379,7 +320,7 @@ function TopPrioritySpace() {
           </nav>
         </div>
         <div className="table-box top_table_box2">
-          <div className="table-top-box">Top Priority Spaces Module</div>
+          <div className="table-top-box">Priority Projects Module</div>
           <TableContainer style={{ overflowX: "hidden" }}>
             <div className="data_table">
               <div className="row">
@@ -393,7 +334,7 @@ function TopPrioritySpace() {
                     </Thead>
 
                     <DragDropContext onDragEnd={onDragEnd}>
-                      <Droppable droppableId="coworkingSpaces">
+                      <Droppable droppableId="projectss">
                         {(provided) => (
                           <Tbody
                             ref={provided.innerRef}
@@ -406,10 +347,10 @@ function TopPrioritySpace() {
                                 </Td>
                               </Tr>
                             ) : (
-                              priorityWorkSpaces.map((space, index) => (
+                              priorityprojects.map((project, index) => (
                                 <Draggable
-                                  key={space._id}
-                                  draggableId={space._id}
+                                  key={project._id}
+                                  draggableId={project._id}
                                   index={index}
                                 >
                                   {(provided) => (
@@ -421,7 +362,7 @@ function TopPrioritySpace() {
                                         {index + 1}
                                       </Td>
                                       <Td {...provided.dragHandleProps}>
-                                        {space?.name}
+                                        {project?.name}
                                       </Td>
                                     </Tr>
                                   )}
@@ -444,4 +385,4 @@ function TopPrioritySpace() {
   );
 }
 
-export default TopPrioritySpace;
+export default BuilderPriority;

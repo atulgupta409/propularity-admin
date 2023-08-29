@@ -51,6 +51,7 @@ const AppProvider = ({ children }) => {
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
+  const [allLocation, setAllLocation] = useState([])
   const [isEditable, setIsEditable] = useState(false);
   const [location, setLocation] = useState({
     address: "",
@@ -158,6 +159,7 @@ const AppProvider = ({ children }) => {
     setEditBuilder,
     isBuilderEditable,
     setIsBuilderEditable,
+    allLocation, setAllLocation
   };
 
   return (

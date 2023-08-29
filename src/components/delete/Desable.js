@@ -15,6 +15,10 @@ import { RxCrossCircled } from "react-icons/rx";
 const Desable = ({ handleFunction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
+  const handleReject = () => {
+    handleFunction();
+    onClose()
+  }
   return (
     <>
       <RxCrossCircled
@@ -41,7 +45,7 @@ const Desable = ({ handleFunction }) => {
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleFunction} ml={3}>
+              <Button colorScheme="red" onClick={handleReject} ml={3}>
                 Disable
               </Button>
             </AlertDialogFooter>

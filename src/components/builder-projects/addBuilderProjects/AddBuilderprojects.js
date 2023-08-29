@@ -38,6 +38,7 @@ function AddBuilderprojects() {
     editorData,
     isEditable,
     setIsEditable,
+    allLocation
   } = GpState();
   const [loading, setLoading] = useState(false);
 
@@ -107,7 +108,7 @@ function AddBuilderprojects() {
       country: selectedCountry?.value,
       state: selectedState?.value,
       city: selectedCity?.value,
-      micro_location: selectedMicroLocation?.value,
+      micro_location: allLocation,
       longitude,
       latitude: lattitude,
       is_near_metro: isChecked,
