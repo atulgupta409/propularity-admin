@@ -16,7 +16,6 @@ import {
 } from "@chakra-ui/react";
 import "./PriorityProjects.css"
 import axios from "axios";
-import { Link } from "react-router-dom";
 import { getMicrolocationByCity } from "../builder-projects/ProjectService";
 import { getCity } from "../builders/BuilderService";
 import Select from "react-select";
@@ -140,30 +139,6 @@ function PriorityProjects() {
     setCurPage(nPage);
   };
 
-  // const handleCheckboxChange = async (event, project) => {
-  //   const { checked } = event.target;
-
-  //   try {
-  //     const updatedProject = {
-  //       order: checked
-  //         ? projects.filter((space) => space.priority.is_active == true)
-  //             .length + 1
-  //         : 1000,
-  //       is_active: checked,
-  //       microlocationId: selectedMicroLocation?.value,
-  //     };
-
-  //     await axios.put(
-  //       `${BASE_URL}/api/project/change-order/${project._id}`,
-  //       updatedProject
-  //     );
-  //     project.priority.is_active = checked;
-  //     setprojects([...projects]);
-  //     handleFetchPriorityprojects(selectedMicroLocation?.value);
-  //   } catch (error) {
-  //     console.error("An error occurred:", error);
-  //   }
-  // };
   const handleCheckboxChange = async (event, project) => {
     const { checked } = event.target;
   
