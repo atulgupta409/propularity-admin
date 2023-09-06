@@ -43,7 +43,7 @@ function AddBuilderprojects() {
   const [loading, setLoading] = useState(false);
 
   const { editProject, setEditProject } = GpState();
-  const { address, longitude, lattitude, isChecked } = location;
+  const { address, longitude, lattitude, longitude2, latitude2, isChecked } = location;
   const toast = useToast();
   const { id } = useParams();
   const handleFetchDatabyId = async () => {
@@ -111,6 +111,8 @@ function AddBuilderprojects() {
       micro_location: allLocation,
       longitude,
       latitude: lattitude,
+      longitude2,
+      latitude2,
       is_near_metro: isChecked,
     },
     plans,

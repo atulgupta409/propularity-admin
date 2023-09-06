@@ -28,7 +28,8 @@ const Location = () => {
   const [country, setCountry] = useState([]);
   const [states, setStates] = useState([]);
 
-  const { address, longitude, lattitude, isChecked } = location;
+  const { address, longitude, lattitude, longitude2,
+  latitude2, isChecked } = location;
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setLocation({
@@ -154,6 +155,8 @@ const Location = () => {
         address: editProject?.location?.address,
         longitude: editProject?.location?.longitude,
         lattitude: editProject?.location?.latitude,
+        longitude2: editProject?.location?.longitude2,
+        latitude2: editProject?.location?.latitude2,
         isChecked: editProject?.location?.is_near_metro,
       });
     } else {
@@ -161,6 +164,8 @@ const Location = () => {
         address: "",
         longitude: "",
         lattitude: "",
+        latitude2: "",
+        longitude2: "",
         isChecked: false,
       });
     }
@@ -264,7 +269,11 @@ const Location = () => {
         </div>
         </div>
         <div className="row mt-4 mb-4">
-          <div className="col-md-3">
+       
+         <div className="col-md-6">
+       <div className="row">
+       <h5 className="property_form_h4">Primary</h5>
+       <div className="col-md-3">
             <div className="form-floating border_field">
               <input
                 type="text"
@@ -294,6 +303,41 @@ const Location = () => {
               <label htmlFor="floatingInputLongi">Longitude</label>
             </div>
           </div>
+       </div>
+         </div>
+        <div className="col-md-6">
+    <div className="row">
+    <h5 className="property_form_h4">Secondary</h5>
+    <div className="col-md-3">
+            <div className="form-floating border_field">
+              <input
+                type="text"
+                className="form-control"
+                id="floatingInputLatti"
+                placeholder="Latitude"
+                name="latitude2"
+                value={latitude2}
+                onChange={handleInputChange}
+              />
+              <label htmlFor="floatingInputLatti">Latitude</label>
+            </div>
+          </div>
+          <div className="col-md-3">
+            <div className="form-floating border_field">
+              <input
+                type="text"
+                className="form-control"
+                id="floatingInputLongi"
+                placeholder="Longitude"
+                name="longitude2"
+                value={longitude2}
+                onChange={handleInputChange}
+              />
+              <label htmlFor="floatingInputLongi">Longitude</label>
+            </div>
+          </div>
+    </div>
+        </div>
         </div>
      
       <div className="row mt-4">

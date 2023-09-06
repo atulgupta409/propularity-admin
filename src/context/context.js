@@ -57,6 +57,8 @@ const AppProvider = ({ children }) => {
     address: "",
     longitude: "",
     lattitude: "",
+    longitude2: "",
+    latitude2: "",
     isChecked: false,
   });
   const login = (userData, authToken) => {

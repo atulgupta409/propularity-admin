@@ -5,7 +5,7 @@ import Addpropertybtn from "../add-new-btn/Addpropertybtn";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { AiOutlineEye } from "react-icons/ai";
-import { changeProjectStatus } from "./ProjectService";
+import { changeProjectStatus, getProjectData, searchedProjects } from "./ProjectService";
 import {
   Table,
   Thead,
@@ -24,98 +24,67 @@ import { AiFillEdit } from "react-icons/ai";
 import Desable from "../delete/Desable";
 import Approve from "../delete/Approve";
 import BASE_URL from "../../apiConfig";
-import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
-const GET_PROJECTS = gql`
-  query {
-    projects {
-        _id 
-      name
-      slug
-      location{
-        city{
-          name
-        }
-        micro_location{
-          name
-        }
-      }
-      status
-      createdAt
-    }
-  }
-`;
+
 
 function BuilderProjects() {
-  const { loading, error, data } = useQuery(GET_PROJECTS);
   const [projects, setprojects] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [citySearchTerm, setCitySearchTerm] = useState("");
   const [microLocationSearchTerm, setMicroLocationSearchTerm] = useState("");
   const [searchedprojects, setSearchedprojects] = useState([]);
-  const [showAll, setShowAll] = useState(true);
+  const [showAll, setShowAll] = useState(false);
   const [searchOption, setSearchOption] = useState("");
+   const [isLoading, setIsLoading] = useState(false)
+   const [curPage, setCurPage] = useState(1);
+   const [selectItemNum, setSelectItemNum] = useState(10);
+   const [totalCount, setTotalCount] = useState(0)
+   const [searchCount, setSearchCount] = useState(0)
+   const [loading, setLoading] = useState(false)
+   const toast = useToast()
 
-  const toast = useToast()
+  const getProjectDataWithPagination = async() => {
+    setIsLoading(true)
+    const data = await getProjectData(curPage, selectItemNum)
+    setprojects(data?.projects)
+    setTotalCount(data?.totalCount)
+    setShowAll(false)
+    setIsLoading(false)
+  }
+
+const getSearchProjects = async() => {
+  setLoading(true)
+  const data = await searchedProjects(searchTerm, citySearchTerm, microLocationSearchTerm, searchOption, curPage, selectItemNum)
+  setSearchedprojects(data?.projects)
+  setSearchCount(data?.totalCount)
+  setLoading(false)
+}
+useEffect(() => {
+  if (searchTerm || citySearchTerm || microLocationSearchTerm || searchOption) {
+    getSearchProjects();
+    setShowAll(true)
+  }
+  else if(searchTerm === "" || citySearchTerm === "" || microLocationSearchTerm === "" ){
+  getProjectDataWithPagination();
+  setShowAll(false)
+  }
+  else{
+    getProjectDataWithPagination();
+    setShowAll(false)
+  }
+}, [searchTerm, citySearchTerm, microLocationSearchTerm, searchOption]);
+
   useEffect(() => {
-    if(data?.projects){
-      setprojects(data?.projects)
-    }
-  }, [data?.projects]);   
-  const handleSearch = () => {
-    const filteredprojects = projects?.filter((project) => {
-      const cityName = project.location.city[0]?.name || "city";
-      const microLocationName =
-        project.location.micro_location[0]?.name || "microlocation";
-      const statusName = project.status;
-      const matchName =
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchTerm.toLowerCase().includes(project.name.toLowerCase());
-
-      const matchCity =
-        cityName.toLowerCase().includes(citySearchTerm.toLowerCase()) ||
-        citySearchTerm.toLowerCase().includes(cityName.toLowerCase());
-
-      const matchMicroLocation =
-        microLocationName
-          .toLowerCase()
-          .includes(microLocationSearchTerm.toLowerCase()) ||
-        microLocationSearchTerm
-          .toLowerCase()
-          .includes(microLocationName.toLowerCase());
-      const matchStatus =
-        statusName.includes(searchOption) || searchOption === "All"
-          ? project
-          : "";
-      return matchName && matchCity && matchMicroLocation && matchStatus;
-    });
-
-    setSearchedprojects(filteredprojects);
-    setCurPage(1);
-  };
-
-  useEffect(() => {
-    handleSearch();
-    setShowAll(
-      searchTerm === "" &&
-        citySearchTerm === "" &&
-        microLocationSearchTerm === "" &&
-        searchOption === ""
-    );
-  }, [
-    updateTable,
-    searchTerm,
-    citySearchTerm,
-    microLocationSearchTerm,
-    searchOption,
-  ]);
+    getProjectDataWithPagination();
+  }, [curPage, selectItemNum]);   
+  
   const handleDeleteprojects = async (id) => {
     try {
       const { data } = await axios.delete(
         `${BASE_URL}/api/project/delete/${id}`
       );
       setUpdateTable((prev) => !prev);
+      getProjectDataWithPagination();
       toast({
         title: "Deleted Successfully!",
         status: "success",
@@ -137,28 +106,32 @@ function BuilderProjects() {
 
   const handleApprove = async (id) => {
     await changeProjectStatus(id, "approve", setUpdateTable, toast);
-    setSearchTerm("");
-    setCitySearchTerm("");
-    setMicroLocationSearchTerm("");
-    setSearchOption("");
+    if(showAll){
+      getSearchProjects();
+    }
+    else{
+      getProjectDataWithPagination()
+    }
+   
   };
   const handleReject = async (id) => {
     await changeProjectStatus(id, "reject", setUpdateTable, toast);
-    setSearchTerm("");
-    setCitySearchTerm("");
-    setMicroLocationSearchTerm("");
-    setSearchOption("");
+    if(showAll){
+      getSearchProjects();
+    }
+    else{
+      getProjectDataWithPagination()
+    }
   };
-  const [selectItemNum, setSelectItemNum] = useState(10);
   const itemsPerPageHandler = (e) => {
     setSelectItemNum(e.target.value);
   };
-  const [curPage, setCurPage] = useState(1);
+
   const recordsPerPage = selectItemNum;
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const nPage = Math.ceil(
-    (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
+    (showAll ? searchCount : totalCount) / selectItemNum
   );
   if (firstIndex > 0) {
     var prePage = () => {
@@ -170,7 +143,7 @@ function BuilderProjects() {
 
   var nextPage = () => {
     const lastPage = Math.ceil(
-      (showAll ? projects?.length : searchedprojects?.length) / selectItemNum
+      (showAll ? searchCount : totalCount) / selectItemNum
     );
     if (curPage < lastPage) {
       setCurPage((prev) => prev + 1);
@@ -269,19 +242,18 @@ function BuilderProjects() {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {loading ? (
+                    {(showAll ? loading : isLoading) ? (
   <Tr>
     <Td colSpan={8} textAlign="center">
       <Spinner size="lg" />
     </Td>
   </Tr>
 ) : (
-  (showAll ? projects : searchedprojects)
-    .slice((curPage - 1) * selectItemNum, curPage * selectItemNum)
+  (showAll ? searchedprojects : projects)
     .map((project) => (
       <Tr className="table_data_row" key={project._id}>
         <Td className="name_heading">{project.name}</Td>
-        <Td className="city_heading">{project.location.city[0]?.name}</Td>
+        <Td className="city_heading">{project.location.city.name}</Td>
         <Td className="micro_heading">
           {project.location.micro_location[0]?.name}
         </Td>
@@ -329,23 +301,22 @@ function BuilderProjects() {
         </Td>
         <Td className="action_heading">
           <div
-            className="d-flex justify-content-between align-items-center main-div"
-            style={{ width: "100px !important" }}
+            className="d-flex justify-content-between align-items-center main-div w-100"
           >
-            <Approve handleFunction={() => handleApprove(project._id)} />
-            <Desable handleFunction={() => handleReject(project._id)} />
+            <Approve isEnabled={project.status === "reject" || project.status === "pending"} handleFunction={() => handleApprove(project._id)} />
+            <Desable isEnabled={project.status === "approve" || project.status === "pending"} handleFunction={() => handleReject(project._id)} />
             <Delete handleFunction={() => handleDeleteprojects(project._id)} />
           </div>
         </Td>
       </Tr>
     ))
 )}
-{(!loading && !((showAll ? projects : searchedprojects)
+{/* {(!loading && !((showAll ? projects : searchedprojects)
   .slice((curPage - 1) * selectItemNum, curPage * selectItemNum).length)) && (
   <Tr>
     <Td colSpan={8}>No matching results found.</Td>
   </Tr>
-)}
+)} */}
                   </Tbody>
                 </Table>
               </div>
@@ -373,16 +344,9 @@ function BuilderProjects() {
             </div>
             <div style={{ width: "110px" }}>
               {firstIndex + 1} -{" "}
-              {showAll
-                ? projects?.slice(
-                    (curPage - 1) * selectItemNum,
-                    curPage * selectItemNum
-                  ).length + firstIndex
-                : searchedprojects?.slice(
-                    (curPage - 1) * selectItemNum,
-                    curPage * selectItemNum
-                  ).length + firstIndex}{" "}
-              of {showAll ? projects?.length : searchedprojects?.length}
+               {projects.length + firstIndex}
+               {" "}  
+              of {(showAll ? searchCount : totalCount)}
             </div>
 
             <div className="page-item">

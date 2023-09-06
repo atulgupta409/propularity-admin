@@ -36,16 +36,16 @@ function BuilderPriority() {
   const data =  await getPropertyTypes();
   setPlanTypes(data)
   };
-  const handleFetchProjects = async (builderId) => {
-    setLoading(true)
-  const data = await getProjectsDataByPlanType(builderId);
+  const handleFetchProjects = async (planTypeId) => {
+  setLoading(true)
+  const data = await getProjectsDataByPlanType(planTypeId);
   setprojects(data)
   setLoading(false)
-    setSearchTerm("");
+   setSearchTerm("");
   };
-  const handleFetchTopProjects = async (builderId) => {
+  const handleFetchTopProjects = async (planTypeId) => {
     setLoadingTable(true)
-    const data = await getTopProjectsByPlanType(builderId)
+    const data = await getTopProjectsByPlanType(planTypeId)
     setPriorityprojects(data)
     setLoadingTable(false)
   };
@@ -120,27 +120,39 @@ function BuilderPriority() {
   const getLastPage = () => {
     setCurPage(nPage);
   };
-
   const handleCheckboxChange = async (event, project) => {
     const { checked } = event.target;
 
     try {
-      const updatedproject = {
-        order: checked
-          ? projects.filter((project) => project.plans_priority.is_active == true)
-              .length + 1
-          : 1000,
+      const selectedPlanTypeId = selectedPlanType?.value;
+      const activePriorityProjects = projects.filter((space) => space.plans_priority.some(p =>{
+        if(p.plans_type && p.plans_type === selectedPlanTypeId) {
+          return p.is_active === true
+        }
+      }));
+      const updatedProject = {
         is_active: checked,
-        plans_type: selectedPlanType?.value,
+        order: checked ? activePriorityProjects.length + 1 : 1000,
+        plans_type: selectedPlanTypeId,
       };
 
       await axios.put(
         `${BASE_URL}/api/project/plans-order/${project._id}`,
-        updatedproject
+        updatedProject
       );
-      project.plans_priority.is_active = checked;
-      setprojects([...projects]);
-      handleFetchTopProjects(selectedPlanType?.value);
+      const updatedProjects = projects.map((p) => {
+        if (p._id === project._id) {
+          p.plans_priority.forEach(priority => {
+          priority.is_active = checked;
+          priority.order = updatedProject.order;
+          priority.plans_type = selectedPlanTypeId;
+          });
+        }
+        return p;
+      });
+      
+      setprojects(updatedProjects);
+      handleFetchTopProjects(selectedPlanTypeId);
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -159,6 +171,7 @@ function BuilderPriority() {
       _id: project._id,
       plans_priority: {
         order: index + 1,
+        plans_type: selectedPlanType?.value
       },
     }));
 
@@ -239,7 +252,7 @@ function BuilderPriority() {
                               <Td>
                                 <input
                                   type="checkbox"
-                                  checked={project.plans_priority.is_active}
+                                  checked={project.plans_priority.some((prev) => prev.plans_type === selectedPlanType?.value ? prev.is_active : false)}
                                   onChange={(event) =>
                                     handleCheckboxChange(event, project)
                                   }

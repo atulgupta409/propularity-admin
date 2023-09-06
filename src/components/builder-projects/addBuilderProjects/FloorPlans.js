@@ -186,13 +186,13 @@ const FloorPlans = () => {
                   type="text"
                   className="form-control"
                   id="floatingInputPrice"
-                  placeholder="Aria*"
+                  placeholder="Area*"
                   name="size"
                   value={row.size}
                   onChange={(e) => handleInputPlanChange(e, row.id)}
                   required
                 />
-                <label htmlFor="floatingInputPrice">Aria</label>
+                <label htmlFor="floatingInputPrice">Area</label>
               </div>
             </div>
             <div className="col-md-2">
