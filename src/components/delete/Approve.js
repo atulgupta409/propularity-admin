@@ -12,19 +12,30 @@ import {
 } from "@chakra-ui/react";
 import { FiCheckSquare } from "react-icons/fi";
 
-const Desable = ({ handleFunction }) => {
+const Approve = ({ handleFunction, isEnabled }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const handleApprove = () => {
     handleFunction();
     onClose()
   }
+
+  if (!isEnabled) {
+    return (
+      <button disabled style={{ fontSize: "20px", cursor: "not-allowed", color: "gray" }}>
+        <FiCheckSquare />
+      </button>
+    );
+  }
   return (
     <>
-      <FiCheckSquare
+     <button   style={{ fontSize: "20px", cursor: "pointer", color: "rgb(63 211 17)" }}>
+     <FiCheckSquare
         onClick={onOpen}
-        style={{ fontSize: "22px", cursor: "pointer", color: "green" }}
+    
       />
+      </button>
+     
 
       <AlertDialog
         isOpen={isOpen}
@@ -38,7 +49,7 @@ const Desable = ({ handleFunction }) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure? You want to Approve this Space.
+              Are you sure? You want to Approve this Project.
             </AlertDialogBody>
 
             <AlertDialogFooter>
@@ -56,4 +67,4 @@ const Desable = ({ handleFunction }) => {
   );
 };
 
-export default Desable;
+export default Approve;

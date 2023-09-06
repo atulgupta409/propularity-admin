@@ -19,7 +19,7 @@ const Delete = ({ handleFunction }) => {
     <>
       <AiFillDelete
         onClick={onOpen}
-        style={{ fontSize: "22px", cursor: "pointer", color: "#ff385c" }}
+        style={{ fontSize: "20px", cursor: "pointer", color: "#ff385c" }}
       />
 
       <AlertDialog
@@ -32,7 +32,7 @@ const Delete = ({ handleFunction }) => {
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Delete
             </AlertDialogHeader>
-
+            
             <AlertDialogBody>
               Are you sure? You want to delete it.
             </AlertDialogBody>

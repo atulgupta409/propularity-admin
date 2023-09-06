@@ -77,16 +77,22 @@ export const getCategory = async (setCategories) => {
   }
 };
 
-export const getProjectData = async () => {
+export const getProjectData = async (page, limit) => {
   try {
-
-    const { data } = await axios.get(`${BASE_URL}/api/project/projects`);
+    const { data } = await axios.get(`${BASE_URL}/api/project/projects-page/?page=${page}&limit=${limit}`);
     return data;
   } catch (error) {
     console.log(error);
   }
 };
-
+export const searchedProjects = async (name, city, microlocation, status, page, limit) => {
+  try {
+    const { data } = await axios.get(`${BASE_URL}/api/project/search-projects?name=${name}&city=${city}&microlocation=${microlocation}&status=${status}&page=${page}&limit=${limit}`);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 export const changeProjectStatus = async (
   id,
   action,

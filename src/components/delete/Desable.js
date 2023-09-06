@@ -12,19 +12,28 @@ import {
 } from "@chakra-ui/react";
 import { RxCrossCircled } from "react-icons/rx";
 
-const Desable = ({ handleFunction }) => {
+const Desable = ({ handleFunction, isEnabled }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const handleReject = () => {
     handleFunction();
     onClose()
   }
+  if (!isEnabled) {
+    return (
+      <button disabled style={{ fontSize: "20px", cursor: "not-allowed", color: "gray" }}>
+        <RxCrossCircled />
+      </button>
+    );
+  }
   return (
     <>
-      <RxCrossCircled
+     <button  style={{ fontSize: "20px", cursor: "pointer", color: "#444" }}>
+     <RxCrossCircled
         onClick={onOpen}
-        style={{ fontSize: "22px", cursor: "pointer", color: "#444" }}
       />
+      </button>
+      
 
       <AlertDialog
         isOpen={isOpen}
@@ -38,7 +47,7 @@ const Desable = ({ handleFunction }) => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure? You want to Disable this Space.
+              Are you sure? You want to Disable this Project.
             </AlertDialogBody>
 
             <AlertDialogFooter>

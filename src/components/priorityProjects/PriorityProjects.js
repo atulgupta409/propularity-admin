@@ -161,18 +161,13 @@ function PriorityProjects() {
       );
   
       // Update the local state to reflect the change
-      const updatedProjects = projects.map((p) => {
-        if (p._id === project._id) {
-          p.priority.forEach(priority => {
-          priority.is_active = checked;
-          priority.order = updatedProject.order;
-          priority.microlocationId = selectedMicroLocationId;
+         project.priority.map((p) => {
+         
+          p.is_active = checked;
+         
           });
-        }
-        return p;
-      });
-  
-      setprojects(updatedProjects);
+         
+      setprojects([...projects]);
       handleFetchPriorityprojects(selectedMicroLocationId);
     } catch (error) {
       console.error("An error occurred:", error);
@@ -294,8 +289,8 @@ function PriorityProjects() {
                               <Td>
                                 <input
                                   type="checkbox"
-                                   checked={space.priority.some((prev) => prev.microlocationId === selectedMicroLocation?.value ? prev.is_active : false)}
-                                  // checked={space.priority.is_active}
+                                   checked={space.priority.some((prev) =>  prev.is_active)}
+                                  
                                   onChange={(event) =>
                                     handleCheckboxChange(event, space)
                                   }

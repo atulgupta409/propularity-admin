@@ -272,7 +272,7 @@ const ProjectDetails = () => {
               name="coming_soon"
               value={projects.coming_soon}
               onChange={handleInputChange}
-              required
+            
             />
             <label htmlFor="floatingInputAddress">Coming Soon</label>
           </div>
