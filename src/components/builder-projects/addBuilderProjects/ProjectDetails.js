@@ -318,7 +318,6 @@ useEffect(() => {
               name="project_size"
               value={projects.project_size}
               onChange={handleInputChange}
-              required
             />
             <label htmlFor="floatingInputAddress">Project Size*</label>
           </div>
@@ -333,7 +332,6 @@ useEffect(() => {
               name="ratings"
               value={projects.ratings}
               onChange={handleInputChange}
-              required
             />
             <label htmlFor="floatingInputAddress">Ratings</label>
           </div>
