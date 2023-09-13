@@ -13,7 +13,6 @@ const AppProvider = ({ children }) => {
   const [contacts, setContacts] = useState([]);
   const [projects, setProjects] = useState({
     name: "",
-    type: "",
     slug: "",
     starting_price: "",
     configuration: "",
@@ -23,6 +22,8 @@ const AppProvider = ({ children }) => {
     coming_soon: "",
     short_descrip: "",
   });
+  const [selectedCategory, setSelectedCategory] = useState('residential');
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [projectSeo, setprojectSeo] = useState({
     title: "",
     description: "",
@@ -123,6 +124,8 @@ const AppProvider = ({ children }) => {
     setContacts,
     projects,
     setProjects,
+    selectedCategory, setSelectedCategory,
+    selectedPlanId, setSelectedPlanId,
     plans,
     setPlans,
     imageData,

@@ -24,6 +24,8 @@ function AddBuilderprojects() {
   const {
     checkedAmenities,
     projects,
+    selectedCategory,
+    selectedPlanId,
     contacts,
     plans,
     projectSeo,
@@ -72,7 +74,8 @@ function AddBuilderprojects() {
   const allData = {
     name: projects?.name,
     builder: selectedBuilder?.value,
-    project_type: projects?.type,
+    project_type: selectedCategory,
+    plans_type: selectedPlanId,
     slug: projects?.slug,
     starting_price: projects?.starting_price,
     configuration: projects?.configuration,

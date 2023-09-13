@@ -126,7 +126,7 @@ useEffect(() => {
   const itemsPerPageHandler = (e) => {
     setSelectItemNum(e.target.value);
   };
-
+  
   const recordsPerPage = selectItemNum;
   const lastIndex = curPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
