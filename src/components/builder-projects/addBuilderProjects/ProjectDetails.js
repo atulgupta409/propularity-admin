@@ -2,18 +2,23 @@ import React, { useState, useEffect } from "react";
 import { getBuilderData } from "../ProjectService";
 import Select from "react-select";
 import { GpState } from "../../../context/context";
+import { getPropertyTypes } from "../../plans-priority/PlansPriorityService";
 const ProjectDetails = () => {
   const {
     projects,
     setProjects,
     checkedFor,
     setCheckedFor,
+    selectedCategory, setSelectedCategory,
+    setSelectedPlanId,
     selectedBuilder,
     setSelectedBuilder,
     editProject,
     isEditable,
   } = GpState();
   const [builders, setbuilders] = useState([]);
+  const [planType, setPlanType] = useState([])
+  const [selectedPlanName, setSelectedPlanName] = useState('');
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProjects({
@@ -41,15 +46,52 @@ const ProjectDetails = () => {
   const handleFetchbuilders = async () => {
     await getBuilderData(setbuilders);
   };
+const handleFetchPlanType = async () => {
+  const data = await getPropertyTypes();
+  setPlanType(data);
+}
+const handleItemSelect = (e) => {
+  const selectedItemValue = e.target.value;
+  const selectedPlan = filteredPlanType.find(
+    (item) => item.name === selectedItemValue
+  );
+if (selectedPlan) {
+    setSelectedPlanId(selectedPlan._id); 
+    setSelectedPlanName(selectedPlan.name);
+  } else {
+    setSelectedPlanId(null);
+    setSelectedPlanName("");
+  }
+};
+const residentialPlan = ["6501887887a793abe11b9081", "65018a3c87a793abe11b90a0", "6501860d87a793abe11b8fdb", '6501861387a793abe11b8fe0', '650185fc87a793abe11b8fd1', '650185ef87a793abe11b8fcc', '6501887e87a793abe11b9086', '6501888d87a793abe11b908b', ]
+const commercialPlan = ["6501889687a793abe11b9090", "6501889f87a793abe11b9095"]
+const filteredPlanType = planType.filter(item => {
+  if (selectedCategory === 'residential') {
+    return residentialPlan.includes(item._id)
+  } else if (selectedCategory === 'commercial') {
+    return commercialPlan.includes(item._id)
+  }
+  return true; 
+});
 
+
+useEffect(() => {
+  if (editProject?.plans_type && isEditable) {
+    const selectedPlan = planType.find((item) => item._id === editProject?.plans_type);
+      if (selectedPlan && true) {
+        setSelectedPlanId(selectedPlan._id);
+        setSelectedPlanName(selectedPlan.name);
+      } 
+  }
+}, [editProject, planType]);
   useEffect(() => {
     handleFetchbuilders();
+    handleFetchPlanType();
   }, []);
   useEffect(() => {
     if (editProject && isEditable) {
-      setProjects({
+      setProjects({ 
         name: editProject?.name,
-        type: editProject?.project_type,
         slug: editProject?.slug,
         starting_price: editProject?.starting_price,
         configuration: editProject?.configuration,
@@ -63,6 +105,8 @@ const ProjectDetails = () => {
         forRent: editProject?.for_rent,
         forSale: editProject?.for_sale,
       });
+      setSelectedCategory(editProject?.project_type)
+     
     } else {
       setProjects({
         name: "",
@@ -103,7 +147,7 @@ const ProjectDetails = () => {
         </div>
       </div>
       <div className="row d-flex align-items-baseline">
-        <div className="col-md-4">
+        <div className="col-md-3">
           <div>
             <Select
               placeholder="Builder"
@@ -132,13 +176,13 @@ const ProjectDetails = () => {
           </div>
         </div>
 
-        <div className="col-md-4">
+        <div className="col-md-2">
           <div
             style={{
               borderBottom: "1px solid #cccccc",
             }}
           >
-            <select
+            {/* <select
               className="form-select"
               value={projects.type}
               name="type"
@@ -148,7 +192,31 @@ const ProjectDetails = () => {
               <option>Type</option>
               <option value="RESIDENTIAL">RESIDENTIAL</option>
               <option value="COMMERCIAL">COMMERCIAL</option>
-              <option value="RETAIL">RETAIL</option>
+            </select> */}
+               <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="residential">Residential</option>
+        <option value="commercial">Commercial</option>
+      </select>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div
+            style={{
+              borderBottom: "1px solid #cccccc",
+            }}
+          >
+            {/* <select
+              className="form-select"
+              value={projects.type}
+              name="type"
+              onChange={handleInputChange}
+              aria-label="Default select example"
+            >
+              <option>Type</option>
+               <option value="RETAIL">RETAIL</option>
               <option value="SERVICE APARTMENT">SERVICE APARTMENT</option>
               <option value="STUDIO APARTMENT">STUDIO APARTMENT</option>
               <option value="INDEPENDENT / BUILDER FLOOR">
@@ -161,7 +229,17 @@ const ProjectDetails = () => {
               <option value="PLOT / RESIDENTIAL LAND">
                 PLOT / RESIDENTIAL LAND
               </option>
-            </select>
+            </select> */}
+              <select value={selectedPlanName} onChange={handleItemSelect}>
+              <option>
+             Select Plan
+             </option>
+             {filteredPlanType.map((item) => (
+          <option key={item._id} value={item.name}>
+            {item.name}
+          </option>
+        ))}
+      </select>
           </div>
         </div>
       </div>
