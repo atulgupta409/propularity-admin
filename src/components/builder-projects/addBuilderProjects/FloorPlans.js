@@ -33,7 +33,7 @@ const FloorPlans = () => {
         category: categories.length >= i + 1 ? categories[i]._id : "",
         price: "",
         size: "",
-        size_sq: "",
+        size_sq: "Sq.Ft.",
         image: [],
       };
       newRows.push(newRow);
@@ -50,7 +50,7 @@ const FloorPlans = () => {
       category: "",
       price: "",
       size: "",
-      size_sq: "",
+      size_sq: "Sq.Ft.",
       image: [],
     };
 
@@ -118,6 +118,7 @@ const FloorPlans = () => {
   useEffect(() => {
     handleFetchCategory();
   }, []);
+
   return (
     <>
       <div className="d-flex w-50 justify-content-between align-items-center top-margin">

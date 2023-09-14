@@ -148,7 +148,7 @@ const ProjectImage = () => {
                               type="text"
                               className="form-control"
                               style={{ color: "#000", minWidth: "200px" }}
-                              value={img.alt.split(".")[0]}
+                              value={img.alt?.split(".")[0]}
                               onChange={(event) =>
                                 handleAltChange(event, index)
                               }
