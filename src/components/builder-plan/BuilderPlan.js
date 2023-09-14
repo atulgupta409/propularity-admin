@@ -42,7 +42,7 @@ function ResPropertyType() {
         {
           name: name,
         }
-      );
+      );  
       setName("");
       setUpdateTable((prev) => !prev);
       onClose();

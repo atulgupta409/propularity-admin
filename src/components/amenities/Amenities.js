@@ -62,6 +62,7 @@ function Amenities() {
       setName("");
       setIcon("");
       setUpdateTable((prev) => !prev);
+      getAmenities()
       onClose();
       toast({
         title: "Saved Successfully!",
@@ -82,17 +83,17 @@ function Amenities() {
     }
   };
 
-  // const getAmenities = async () => {
-  //   try {
-  //     setisLoading(true);
-  //     const { data } = await axios.get(`${BASE_URL}/api/amenity/amenities`);
-  //     const newData = data.reverse();
-  //     setAmenities(newData);
-  //     setisLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const getAmenities = async () => {
+    try {
+      setisLoading(true);
+      const { data } = await axios.get(`${BASE_URL}/api/amenity/amenities`);
+      const newData = data.reverse();
+      setAmenities(newData);
+      setisLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleDeleteAmenities = async (id) => {
     try {
@@ -100,6 +101,7 @@ function Amenities() {
         `${BASE_URL}/api/amenity/delete/${id}`
       );
       setUpdateTable((prev) => !prev);
+      getAmenities();
       toast({
         title: "Deleted Successfully!",
         status: "success",
@@ -118,11 +120,7 @@ function Amenities() {
       });
     }
   };
-  useEffect(() => {
-    if(!loading){
-      setAmenities(data?.amenities)
-    }
-  }, [data?.amenities]);
+
   const handleSearch = () => {
     const filteredAmenities = amenities.filter((amenity) => {
       const matchName =
@@ -135,7 +133,9 @@ function Amenities() {
     setSearchedAmenities(filteredAmenities);
     setCurPage(1);
   };
-
+  useEffect(() => {
+    getAmenities();
+  },[])
   useEffect(() => {
     handleSearch();
     setShowAll(searchTerm === "");
@@ -176,7 +176,6 @@ function Amenities() {
   const getLastPage = () => {
     setCurPage(nPage);
   };
-  console.log(amenities)
   return (
     <>
       <div className="mx-5 mt-3">
@@ -275,7 +274,7 @@ function Amenities() {
                     .map((amenity) => (
                       <Tr key={amenity._id} id={amenity._id}>
                         <Td>{amenity.name}</Td>
-                        <Td>{amenity.icon}</Td>
+                        <Td>{amenity.icon.slice(0,50)}</Td>
                         <Td>
                           <Delete
                             handleFunction={() =>
@@ -294,7 +293,7 @@ function Amenities() {
                     .map((amenity) => (
                       <Tr key={amenity._id} id={amenity._id}>
                         <Td>{amenity.name}</Td>
-                        <Td>{amenity.icon}</Td>
+                        <Td>{amenity.icon.slice(0, 50)}</Td>
                         <Td>
                           <Delete
                             handleFunction={() =>

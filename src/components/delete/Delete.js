@@ -15,6 +15,10 @@ import { AiFillDelete } from "react-icons/ai";
 const Delete = ({ handleFunction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
+  const handleDelete = () => {
+    handleFunction();
+    onClose()
+  }
   return (
     <>
       <AiFillDelete
@@ -41,7 +45,7 @@ const Delete = ({ handleFunction }) => {
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleFunction} ml={3}>
+              <Button colorScheme="red" onClick={handleDelete} ml={3}>
                 Delete
               </Button>
             </AlertDialogFooter>

@@ -159,13 +159,16 @@ function PriorityProjects() {
         `${BASE_URL}/api/project/change-order/${project._id}`,
         updatedProject
       );
-  
+      // const priorityIndex = project.priority.findIndex(
+      //   (p) => p.microlocationId === selectedMicroLocationId
+      // );
+      // console.log(priorityIndex)
+      // if (priorityIndex !== -1) {
+        // Update the is_active property of the specific priority object
+        project.priority[0].is_active = checked;
+      // }
       // Update the local state to reflect the change
-         project.priority.map((p) => {
-         
-          p.is_active = checked;
-         
-          });
+        //  project.priority.is_active = checked; 
          
       setprojects([...projects]);
       handleFetchPriorityprojects(selectedMicroLocationId);
@@ -289,7 +292,7 @@ function PriorityProjects() {
                               <Td>
                                 <input
                                   type="checkbox"
-                                   checked={space.priority.some((prev) =>  prev.is_active)}
+                                   checked={space.priority.some((prev) => prev.microlocationId === selectedMicroLocation?.value ?  prev.is_active : false)}
                                   
                                   onChange={(event) =>
                                     handleCheckboxChange(event, space)
