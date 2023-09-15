@@ -42,18 +42,19 @@ function AddBuilderprojects() {
     setIsEditable,
     allLocation
   } = GpState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { editProject, setEditProject } = GpState();
   const { address, longitude, lattitude, longitude2, latitude2, isChecked } = location;
   const toast = useToast();
   const { id } = useParams();
+
   const handleFetchDatabyId = async () => {
     setLoading(true);
+    setIsEditable(true);
     const data = await getProjectsById(id);
     setEditProject(data);
     setLoading(false);
-    setIsEditable(true);
   };
   const previewFile = (data) => {
     const allimages = images;

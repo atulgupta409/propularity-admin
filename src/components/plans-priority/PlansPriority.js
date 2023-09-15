@@ -63,7 +63,14 @@ function BuilderPriority() {
         break;
     }
   };
-  const planTypesOptions = planTypes?.map((type) => ({
+  const allPlans = ["6501889687a793abe11b9090", "6501889f87a793abe11b9095", "6501887887a793abe11b9081", "65018a3c87a793abe11b90a0", "6501860d87a793abe11b8fdb", '6501861387a793abe11b8fe0', '650185fc87a793abe11b8fd1', '650185ef87a793abe11b8fcc', '6501887e87a793abe11b9086', '6501888d87a793abe11b908b', ]
+
+const filteredPlanType = planTypes.filter(item => {
+
+    return allPlans.includes(item._id)
+  
+});
+  const planTypesOptions = filteredPlanType?.map((type) => ({
     value: type._id,
     label: type.name,
   }));
@@ -140,18 +147,23 @@ function BuilderPriority() {
         `${BASE_URL}/api/project/plans-order/${project._id}`,
         updatedProject
       );
-      const updatedProjects = projects.map((p) => {
-        if (p._id === project._id) {
-          p.plans_priority.forEach(priority => {
-          priority.is_active = checked;
-          priority.order = updatedProject.order;
-          priority.plans_type = selectedPlanTypeId;
-          });
-        }
-        return p;
-      });
-      
-      setprojects(updatedProjects);
+      //  projects.map((p) => {
+      //   if (p._id === project._id) {
+      //     p.plans_priority.forEach(priority => {
+      //     priority.is_active = checked;
+      //     priority.order = updatedProject.order;
+      //     priority.plans_type = selectedPlanTypeId;
+      //     });
+      //   }
+      //   return p;
+      // });
+      project.plans_priority.forEach(priority => {
+       return  priority.is_active = checked;
+      //  priority.order = updatedProject.order;
+      //  priority.plans_type = selectedPlanTypeId;
+        });
+      console.log(projects)
+      setprojects([...projects]);
       handleFetchTopProjects(selectedPlanTypeId);
     } catch (error) {
       console.error("An error occurred:", error);
@@ -252,8 +264,10 @@ function BuilderPriority() {
                               <Td>
                                 <input
                                   type="checkbox"
-                                  checked={project.plans_priority.some((prev) => prev.plans_type === selectedPlanType?.value ? prev.is_active : false)}
-                                  onChange={(event) =>
+                                  checked={project.plans_priority.some((prev) =>{ if(prev.plans_type && prev.plans_type === selectedPlanType?.value){
+                                    return prev.is_active
+                                  }} )}
+                    onChange={(event) =>
                                     handleCheckboxChange(event, project)
                                   }
                                 />

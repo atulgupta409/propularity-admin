@@ -136,6 +136,7 @@ function Popularproject() {
         updatedproject
       );
       project.is_popular.status = checked;
+      console.log(projects)
       setprojects([...projects]);
       handleFetchTopProjects(selectedCity?.value);
     } catch (error) {
