@@ -29,6 +29,7 @@ const AddBuilder = () => {
     setEditBuilder,
     isBuilderEditable,
     setIsBuilderEditable,
+    aboutEditor
   } = GpState();
   const {
     name,
@@ -55,7 +56,7 @@ const AddBuilder = () => {
     isChecked,
   } = builderSeo;
   const { id } = useParams();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
       case "city":
@@ -92,17 +93,18 @@ const AddBuilder = () => {
   };
   const handleFetchBuilderById = async () => {
     setLoading(true);
+    setIsBuilderEditable(true);
     const data = await getbuildersDataById(id);
     setEditBuilder(data);
-    setIsBuilderEditable(true);
     setLoading(false);
-  };
+  };  
   const allCity = selectedCity?.map((city) => city.value);
   const allData = {
     name,
     starting_price,
     configuration,
     description: footer_des,
+    about_builder: aboutEditor,
     estb_year,
     ratings,
     residential_num,
@@ -130,7 +132,7 @@ const AddBuilder = () => {
       },
     },
   };
-  console.log(footer_des);
+  
   const handleSaveBuilder = async (e) => {
     e.preventDefault();
     try {

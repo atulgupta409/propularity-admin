@@ -106,7 +106,7 @@ const AppProvider = ({ children }) => {
   });
   const [footer_des, setFooter_des] = useState("");
   const [builderImage, setBuilderImage] = useState([]);
-
+  const [aboutEditor, SetAboutEditor] = useState("")
   const allValues = {
     userInfo,
     token,
@@ -164,7 +164,8 @@ const AppProvider = ({ children }) => {
     setEditBuilder,
     isBuilderEditable,
     setIsBuilderEditable,
-    allLocation, setAllLocation
+    allLocation, setAllLocation,
+    aboutEditor, SetAboutEditor
   };
 
   return (

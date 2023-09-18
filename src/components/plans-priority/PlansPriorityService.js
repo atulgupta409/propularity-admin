@@ -11,10 +11,10 @@ export const getPropertyTypes = async () => {
       console.log(error);
     }
   };
-export const getProjectsDataByPlanType = async (plansId) => {
+export const getProjectsDataByPlanAndCity = async (plansId, city) => {
     try {
       const { data } = await axios.get(
-        `${BASE_URL}/api/project/projects-by-plans/${plansId}`
+        `${BASE_URL}/api/project/projects-by-plans/${plansId}/${city}`
       );
   
      return data;
@@ -23,10 +23,10 @@ export const getProjectsDataByPlanType = async (plansId) => {
     }
   };
   
-  export const getTopProjectsByPlanType = async (plansId) => {
+  export const getTopProjectsByPlanType = async (plansId, city) => {
     try {
       const { data } = await axios.get(
-        `${BASE_URL}/api/project/plans-projects/${plansId}`
+        `${BASE_URL}/api/project/plans-projects/${plansId}/${city}`
       );
   return data;
     } catch (error) {

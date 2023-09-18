@@ -28,6 +28,7 @@ import PasswordReset from "./components/login-page/PasswordReset";
 import AddBuilder from "./components/builders/addbuilders/AddBuilder";
 import BuilderPriority from "./components/builder-priority/BuilderPriority";
 import PlansPriority from "./components/plans-priority/PlansPriority"
+import Priority from "./components/priority-In-India/Priority";
 function App() {
   const { isLogin } = GpState();
   return (
@@ -142,6 +143,10 @@ function App() {
               <Route
                 path="/plans-priority"
                 element={isLogin ? <PlansPriority /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/priority-india"
+                element={isLogin ? <Priority /> : <Navigate to="/" />}
               />
               <Route path="/password-reset" element={<PasswordReset />} />
               <Route

@@ -18,8 +18,9 @@ import BASE_URL from "../../apiConfig";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   getTopProjectsByPlanType,
-  getProjectsDataByPlanType,
+  getProjectsDataByPlanAndCity,
 } from "./PlansPriorityService";
+import { getCity } from "../builders/BuilderService";
 import { getPropertyTypes } from "./PlansPriorityService";
 function BuilderPriority() {
   const [loading, setLoading] = useState(false);
@@ -32,20 +33,25 @@ function BuilderPriority() {
   const [selectedPlanType, setSelectedPlanType] = useState(null);
   const [priorityprojects, setPriorityprojects] = useState([]);
   const [loadingTable, setLoadingTable] = useState(false);
+  const [selectedCity, setSelectedCity] = useState(null);
+  const [cities, setCities] = useState([]);
   const handleFetchTypes = async () => {
   const data =  await getPropertyTypes();
   setPlanTypes(data)
   };
-  const handleFetchProjects = async (planTypeId) => {
+  const handleFetchCity = async () => {
+    await getCity(setCities);
+  };
+  const handleFetchProjects = async (planTypeId, cityId) => {
   setLoading(true)
-  const data = await getProjectsDataByPlanType(planTypeId);
+  const data = await getProjectsDataByPlanAndCity(planTypeId, cityId);
   setprojects(data)
   setLoading(false)
    setSearchTerm("");
   };
-  const handleFetchTopProjects = async (planTypeId) => {
+  const handleFetchTopProjects = async (planTypeId, cityId) => {
     setLoadingTable(true)
-    const data = await getTopProjectsByPlanType(planTypeId)
+    const data = await getTopProjectsByPlanType(planTypeId, cityId)
     setPriorityprojects(data)
     setLoadingTable(false)
   };
@@ -54,15 +60,22 @@ function BuilderPriority() {
       case "PlanType":
         setSelectedPlanType(selectedOption);
 
-        handleFetchProjects(selectedOption ? selectedOption.value : null);
+        handleFetchProjects(selectedOption ? selectedOption.value : null, selectedCity?.value);
         handleFetchTopProjects(
-          selectedOption ? selectedOption.value : null
+          selectedOption ? selectedOption.value : null, selectedCity?.value
         );
         break;
+     case "city":
+          setSelectedCity(selectedOption);
+          break;
       default:
         break;
     }
   };
+  const cityOptions = cities?.map((city) => ({
+    value: city._id,
+    label: city.name,
+  }));
   const allPlans = ["6501889687a793abe11b9090", "6501889f87a793abe11b9095", "6501887887a793abe11b9081", "65018a3c87a793abe11b90a0", "6501860d87a793abe11b8fdb", '6501861387a793abe11b8fe0', '650185fc87a793abe11b8fd1', '650185ef87a793abe11b8fcc', '6501887e87a793abe11b9086', '6501888d87a793abe11b908b', ]
 
 const filteredPlanType = planTypes.filter(item => {
@@ -88,6 +101,7 @@ const filteredPlanType = planTypes.filter(item => {
   };
 
   useEffect(() => {
+    handleFetchCity();
     handleSearch();
     handleFetchTypes();
     setShowAll(searchTerm === "");
@@ -141,6 +155,7 @@ const filteredPlanType = planTypes.filter(item => {
         is_active: checked,
         order: checked ? activePriorityProjects.length + 1 : 1000,
         plans_type: selectedPlanTypeId,
+        cityId: selectedCity?.value
       };
 
       await axios.put(
@@ -162,9 +177,8 @@ const filteredPlanType = planTypes.filter(item => {
       //  priority.order = updatedProject.order;
       //  priority.plans_type = selectedPlanTypeId;
         });
-      console.log(projects)
       setprojects([...projects]);
-      handleFetchTopProjects(selectedPlanTypeId);
+      handleFetchTopProjects(selectedPlanTypeId, selectedCity?.value);
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -203,6 +217,18 @@ const filteredPlanType = planTypes.filter(item => {
       <div className="table-box table_top_header">
         <div className="table-top-box">Projects Priority by Builder Module</div>
         <div className="row my-5">
+        <div className="col-md-3">
+            <Select
+              placeholder="City*"
+              value={selectedCity}
+              options={cityOptions}
+              onChange={(selectedOption) =>
+                onChangeOptionHandler(selectedOption, "city")
+              }
+              isSearchable
+              required
+            />
+          </div>
           <div className="col-md-3">
             <Select
               placeholder="PlanTypes*"
@@ -273,9 +299,7 @@ const filteredPlanType = planTypes.filter(item => {
                                 />
                               </Td>
                               <Td>
-                                {project?.name.length > 20
-                                  ? project?.name.slice(0, 15) + "..."
-                                  : project?.name}
+                                {project?.name}
                               </Td>
                               <Td>
                                 {project.location?.micro_location
@@ -286,12 +310,12 @@ const filteredPlanType = planTypes.filter(item => {
                           ))
                       
                       }
-                      {(!loading && !((showAll ? projects : searchedprojects)
+                      {/* {(!loading && !((showAll ? projects : searchedprojects)
   .slice((curPage - 1) * selectItemNum, curPage * selectItemNum).length)) && (
   <Tr>
     <Td colSpan={8}>No matching results found.</Td>
   </Tr>
-)}
+)} */}
                     </Tbody>
                   </Table>
                 </div>
