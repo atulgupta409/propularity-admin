@@ -103,6 +103,12 @@ function Sidebar() {
               </NavLink>
             </li>
             <li className="nav-item">
+              <NavLink to="/priority-india">
+                <HiOutlineBuildingOffice className="icon" />
+               Projects India
+              </NavLink>
+            </li>
+            <li className="nav-item">
               <NavLink to="/top-projects">
                 <HiOutlineBuildingOffice className="icon" />
                 Top Projects

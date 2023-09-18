@@ -42,7 +42,7 @@ function BuilderProjects() {
    const [searchCount, setSearchCount] = useState(0)
    const [loading, setLoading] = useState(false)
    const toast = useToast()
-
+  
   const getProjectDataWithPagination = async() => {
     setIsLoading(true)
     const data = await getProjectData(curPage, selectItemNum)

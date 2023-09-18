@@ -12,9 +12,10 @@ const BuilderSeo = () => {
     editBuilder,
     isBuilderEditable,
     setFooter_des,
-    footer_des
+   SetAboutEditor
   } = GpState();
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [editorState2, setEditorState2] = useState(EditorState.createEmpty());
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBuilderSeo({
@@ -36,7 +37,24 @@ const BuilderSeo = () => {
   const onEditorStateChange = (editorState) => {
     setEditorState(editorState);
   };
-  console.log(footer_des)
+  const onEditorStateChange2 = (editorState) => {
+    setEditorState2(editorState);
+  };
+  const handlePastedText2 = (text, html, editorState) => {
+    const plainText = text.replace(/(<([^>]+)>)/gi, ""); // Remove HTML tags
+    const contentState = ContentState.createFromText(plainText);
+    const newContentState = Modifier.replaceWithFragment(
+      editorState.getCurrentContent(),
+      editorState.getSelection(),
+      contentState.getBlockMap()
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-fragment"
+    );
+    setEditorState2(newEditorState);
+  };
   useEffect(() => {
     if (editBuilder?.description && isBuilderEditable) {
       const blocks = htmlToDraft(editBuilder?.description || "empty");
@@ -52,10 +70,27 @@ const BuilderSeo = () => {
     }
   }, [editBuilder]);
   useEffect(() => {
+    if (editBuilder?.about_builder && isBuilderEditable) {
+      const blocks = htmlToDraft(editBuilder?.about_builder || "empty");
+      const { contentBlocks, entityMap } = blocks;
+      const contentState = ContentState.createFromBlockArray(
+        contentBlocks,
+        entityMap
+      );
+      const initialEditorState = EditorState.createWithContent(contentState);
+      setEditorState2(initialEditorState);
+    } else {
+      setEditorState2(() => EditorState.createEmpty());
+    }
+  }, [editBuilder?.about_builder]);
+  useEffect(() => {
     if (editorState) {
       setFooter_des(draftToHtml(convertToRaw(editorState.getCurrentContent())));
     }
-  }, [editorState]);
+    if (editorState2) {
+      SetAboutEditor(draftToHtml(convertToRaw(editorState2.getCurrentContent())));
+    }
+  }, [editorState, editorState2]);
   useEffect(() => {
     if (editBuilder && isBuilderEditable) {
       setBuilderSeo({
@@ -102,6 +137,19 @@ const BuilderSeo = () => {
   };
   return (
     <>
+    <div className="row mt-5">
+    <h4 className="property_form_h4">About Builder</h4>
+        <div className="col-md-12">
+        <Editor
+            editorState={editorState2}
+            toolbarClassName="toolbarClassName"
+            wrapperClassName="wrapperClassName"
+            editorClassName="editorClassName"
+            handlePastedText={handlePastedText2}
+            onEditorStateChange={onEditorStateChange2}
+          />
+        </div>
+      </div>
       <div className="row mt-5">
         <h4 className="property_form_h4">SEO Details</h4>
         <div className="col-md-6">
