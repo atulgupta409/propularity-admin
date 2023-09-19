@@ -79,7 +79,7 @@ function ResPropertyType() {
       console.log(error);
     }
   };
-  console.log(propertyTypes)
+ 
   const handleDeletePropertyTypes = async (id) => {
     try {
       const { data } = await axios.delete(
