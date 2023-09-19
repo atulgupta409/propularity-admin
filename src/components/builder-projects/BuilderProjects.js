@@ -64,7 +64,7 @@ useEffect(() => {
     getSearchProjects();
     setShowAll(true)
   }
-  else if(searchTerm === "" || citySearchTerm === "" || microLocationSearchTerm === "" ){
+  else if(searchTerm === "" || citySearchTerm === "" || microLocationSearchTerm === ""){
   getProjectDataWithPagination();
   setShowAll(false)
   }
@@ -73,6 +73,7 @@ useEffect(() => {
     setShowAll(false)
   }
 }, [searchTerm, citySearchTerm, microLocationSearchTerm, searchOption]);
+
 
   useEffect(() => {
     getProjectDataWithPagination();

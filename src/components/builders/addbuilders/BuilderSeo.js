@@ -135,6 +135,7 @@ const BuilderSeo = () => {
     );
     setEditorState(newEditorState);
   };
+
   return (
     <>
     <div className="row mt-5">

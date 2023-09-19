@@ -62,3 +62,24 @@ export const uploadFile = async (
       console.log(err);
     });
 };
+
+export const uploadPdfFile = async (
+  files,
+  previewFile
+) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("files", file, file.name);
+  });
+
+  await axios
+    .post(`${BASE_URL}/upload-image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((res) => {previewFile(res.data)})
+    .catch((err) => {
+      console.log(err);
+    });
+};

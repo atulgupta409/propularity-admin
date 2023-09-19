@@ -40,7 +40,8 @@ function AddBuilderprojects() {
     editorData,
     isEditable,
     setIsEditable,
-    allLocation
+    allLocation,
+    pdf
   } = GpState();
   const [loading, setLoading] = useState(true);
 
@@ -88,6 +89,7 @@ function AddBuilderprojects() {
     for_rent: checkedFor?.forRent,
     for_sale: checkedFor?.forSale,
     images: imageData,
+    brochure: pdf,
     amenties: checkedAmenities,
     master_plan: images[0],
     highlights: editorData?.highlights,

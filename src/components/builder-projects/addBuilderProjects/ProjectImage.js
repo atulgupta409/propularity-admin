@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { AiFillDelete } from "react-icons/ai";
-import { uploadFile } from "../../../services/Services";
+import { uploadFile, uploadPdfFile } from "../../../services/Services";
 
 import {
   Table,
@@ -16,12 +16,18 @@ const ProjectImage = () => {
   const [fileName, setFileName] = useState([]);
   const [progress, setProgress] = useState(0);
   const [images, setImages] = useState([]);
-  const { imageData, setImageData, editProject, isEditable } = GpState();
+  const { imageData, setImageData, editProject, isEditable, pdf, setPdf } = GpState();
   const [isUploaded, setIsUploaded] = useState(false);
   const removePreviewImage = (index) => {
     const updatedImages = [...imageData];
     updatedImages.splice(index, 1);
     setImageData(updatedImages);
+  };
+  const previewFile = (data) => {
+    setImages((prevImages) => [...prevImages, ...data]);
+  };
+  const previewPdf = (data) => {
+    setPdf(data[0]);
   };
   const handleUploadFile = async (files) => {
     await uploadFile(files, setProgress, setIsUploaded, previewFile);
@@ -31,6 +37,10 @@ const ProjectImage = () => {
     handleUploadFile(files);
     const fileNames = files.map((file) => file.name);
     setFileName(fileNames);
+  };
+  const handleUploadPdf = (e) => {
+    const files = Array.from(e.target.files);
+    uploadPdfFile(files, previewPdf);
   };
   const handleAltChange = (event, index) => {
     const updatedArray = [...imageData]; // Create a copy of the mergedArray
@@ -47,6 +57,7 @@ const ProjectImage = () => {
         alt: fileName[index],
       }));
       setImageData([...editProject?.images, ...combinedArray]);
+      setPdf(editProject?.brochure)
     } else {
       const combinedArray = images.map((image, index) => ({
         image,
@@ -54,13 +65,11 @@ const ProjectImage = () => {
         alt: fileName[index],
       }));
       setImageData([...combinedArray]);
+      setPdf("")
     }
   }, [images, fileName, editProject?.images]);
 
-  const previewFile = (data) => {
-    setImages((prevImages) => [...prevImages, ...data]);
-  };
-
+ 
   return (
     <>
       <div className="row top-margin image-border">
@@ -171,6 +180,18 @@ const ProjectImage = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="row mt-5">
+      <h4 className="property_form_h4">Upload Brochure</h4>
+      <input
+        type="file"
+        accept=".pdf"
+        onChange={handleUploadPdf}
+      />
+      {(editProject?.brochure || pdf) &&  <a href={pdf} download>
+        Download {editProject?.name} Brochure
+      </a>
+      }
       </div>
     </>
   );
