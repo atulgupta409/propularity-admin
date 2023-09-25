@@ -41,7 +41,7 @@ const AppProvider = ({ children }) => {
   const [imageData, setImageData] = useState([]);
   const [checkedFor, setCheckedFor] = useState({
     forRent: false,
-    forSale: false,
+    forSale: true,
   });
   const [selectedBuilder, setSelectedBuilder] = useState(null);
   const [editorData, setEditorData] = useState({

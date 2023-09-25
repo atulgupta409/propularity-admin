@@ -121,8 +121,8 @@ useEffect(() => {
         short_descrip: "",
       });
       setCheckedFor({
-        forRent: false,
-        forSale: false,
+        forRent: false, 
+        forSale: true,
       });
     }
   }, [editProject]);
@@ -182,17 +182,6 @@ useEffect(() => {
               borderBottom: "1px solid #cccccc",
             }}
           >
-            {/* <select
-              className="form-select"
-              value={projects.type}
-              name="type"
-              onChange={handleInputChange}
-              aria-label="Default select example"
-            >
-              <option>Type</option>
-              <option value="RESIDENTIAL">RESIDENTIAL</option>
-              <option value="COMMERCIAL">COMMERCIAL</option>
-            </select> */}
                <select
         value={selectedCategory}
         onChange={(e) => setSelectedCategory(e.target.value)}
@@ -208,28 +197,6 @@ useEffect(() => {
               borderBottom: "1px solid #cccccc",
             }}
           >
-            {/* <select
-              className="form-select"
-              value={projects.type}
-              name="type"
-              onChange={handleInputChange}
-              aria-label="Default select example"
-            >
-              <option>Type</option>
-               <option value="RETAIL">RETAIL</option>
-              <option value="SERVICE APARTMENT">SERVICE APARTMENT</option>
-              <option value="STUDIO APARTMENT">STUDIO APARTMENT</option>
-              <option value="INDEPENDENT / BUILDER FLOOR">
-                INDEPENDENT / BUILDER FLOOR
-              </option>
-              <option value="INDEPENDENT / VILLA / HOUSE">
-                INDEPENDENT / VILLA / HOUSE
-              </option>
-              <option value="FARM HOUSE">FARM HOUSE</option>
-              <option value="PLOT / RESIDENTIAL LAND">
-                PLOT / RESIDENTIAL LAND
-              </option>
-            </select> */}
               <select value={selectedPlanName} onChange={handleItemSelect}>
               <option>
              Select Plan
@@ -359,21 +326,6 @@ useEffect(() => {
               className="form-check-input"
               type="checkbox"
               id="flexCheckDefault"
-              name="forRent"
-              checked={checkedFor.forRent}
-              onChange={handleCheckboxChange}
-            />
-            <label className="form-check-label" htmlFor="flexCheckDefault">
-              For Rent
-            </label>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="flexCheckDefault"
               name="forSale"
               checked={checkedFor.forSale}
               onChange={handleCheckboxChange}
@@ -383,6 +335,22 @@ useEffect(() => {
             </label>
           </div>
         </div>
+        <div className="col-md-4">
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="flexCheckDefault"
+              name="forRent"
+              checked={checkedFor.forRent}
+              onChange={handleCheckboxChange}
+            />
+            <label className="form-check-label" htmlFor="flexCheckDefault">
+              For Rent
+            </label>
+          </div>
+        </div>
+       
       </div>
       <div className="row mt-4">
         <div className="col-md-12">
