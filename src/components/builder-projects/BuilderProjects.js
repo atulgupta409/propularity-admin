@@ -64,6 +64,7 @@ useEffect(() => {
     getSearchProjects();
     setShowAll(true)
   }
+  
   else if(searchTerm === "" || citySearchTerm === "" || microLocationSearchTerm === ""){
   getProjectDataWithPagination();
   setShowAll(false)
@@ -277,6 +278,7 @@ useEffect(() => {
         <Td className="edit_heading">
           <Link
             to={`/builder-projects/edit-project/${project._id}`}
+            target="_blank"
           >
             <AiFillEdit
               style={{
@@ -288,7 +290,7 @@ useEffect(() => {
         </Td>
         <Td className="preview_heading">
           <Link
-            to={`https://spacite.com/coworking/${project.slug}`}
+            to={`https://propularity.in/${project?.builder?.name?.toLowerCase()}/${project?.location?.city?.name?.toLowerCase()}/${project.slug}`}
             target="_blank"
           >
             <AiOutlineEye
