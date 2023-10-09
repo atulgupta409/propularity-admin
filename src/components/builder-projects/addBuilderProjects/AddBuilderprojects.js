@@ -73,6 +73,12 @@ function AddBuilderprojects() {
       setIsEditable(false);
     }
   }, []);
+  console.log(selectedMicroLocation)
+  const priority = allLocation.map((microlocationId) => ({
+    is_active: false,
+    order: 1000,
+    microlocationId: microlocationId, // Convert to ObjectId
+  }));
   const allData = {
     name: projects?.name,
     builder: selectedBuilder?.value,
