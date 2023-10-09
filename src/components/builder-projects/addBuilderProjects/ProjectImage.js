@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { AiFillDelete } from "react-icons/ai";
 import { uploadFile, uploadPdfFile } from "../../../services/Services";
 
 import {
@@ -15,6 +14,7 @@ import { GpState } from "../../../context/context";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import axios from "axios";
 import BASE_URL from "../../../apiConfig";
+import Delete from "../../delete/Delete";
 const ProjectImage = () => {
   const [fileName, setFileName] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -83,12 +83,14 @@ const ProjectImage = () => {
     const [movedSpace] = recordedimage.splice(source.index, 1);
     recordedimage.splice(destination.index, 0, movedSpace);
 
-    // Create the payload with updated priority order for each coworking space
     const updatedOrderPayload = recordedimage.map((image, index) => ({
       _id: image._id,
        order: index + 1,
+       image: image.image,
+       alt: image.alt,
+       name: image.name
     }));
-    setImageData(recordedimage);
+    setImageData(updatedOrderPayload);
     const updateImages = {
       _id: editProject?._id,
       updateImage: updatedOrderPayload
@@ -98,13 +100,20 @@ const ProjectImage = () => {
         `${BASE_URL}/api/project/drag-images`,
         updateImages
       );
-      if (!response.ok) {
-        throw new Error("Failed to update priority order.");
-      }
+
     } catch (error) {
       console.error("Error updating priority order:", error);
       // Handle error (e.g., show an error message to the user)
     }
+    };
+    const handleDelete = async (imageId ) => {
+      try {
+        const response = await axios.delete(`${BASE_URL}/api/project/${editProject?._id}/images/${imageId}`);
+        setImageData((prevImages) => prevImages.filter((image) => image._id !== imageId));
+         
+      } catch (error) {
+        console.error('Error deleting image:', error.message);
+      }
     };
   return (
     <>
@@ -167,48 +176,6 @@ const ProjectImage = () => {
                       <Th>Delete</Th>
                     </Tr>
                   </Thead>
-                    {/* {imageData?.map((img, index) => (
-                      <Fragment key={index}>
-                        <Tr>
-                          <Td>{index + 1}</Td>
-                          <Td>
-                            <img
-                              src={img.image}
-                              alt="media"
-                              width="500px"
-                              height="250px"
-                            />
-                          </Td>
-                          <Td>
-                            <input
-                              type="text"
-                              className="form-control"
-                              style={{ color: "#000" }}
-                              value={img.name}
-                            />
-                          </Td>
-                          <Td>
-                            <input
-                              type="text"
-                              className="form-control"
-                              style={{ color: "#000", minWidth: "200px" }}
-                              value={img.alt?.split(".")[0]}
-                              onChange={(event) =>
-                                handleAltChange(event, index)
-                              }
-                            />
-                          </Td>
-
-                          <Td>
-                            <AiFillDelete
-                              onClick={() => removePreviewImage(index)}
-                              className="icon"
-                              style={{ color: "red" }}
-                            />
-                          </Td>
-                        </Tr>
-                      </Fragment>
-                    ))} */}
                      <DragDropContext onDragEnd={onDragEnd}>
                       <Droppable droppableId="images">
                         {(provided) => (
@@ -259,13 +226,14 @@ const ProjectImage = () => {
                               }
                             />
                                       </Td>
-                                      <Td {...provided.dragHandleProps}>
+                                      <Td>
                                    
-                                      <AiFillDelete
-                              onClick={() => removePreviewImage(index)}
+                                      {/* <AiFillDelete
+                              onClick={() => handleDelete(img._id)}
                               className="icon"
-                              style={{ color: "red" }}
-                            />
+                              style={{ color: "red" , cursor: "pointer"}}
+                            /> */}
+                            <Delete handleFunction={() => handleDelete(img._id)}/>
                                    </Td>
                                     </Tr>
                                   )}
