@@ -12,6 +12,9 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { GpState } from "../../../context/context";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import axios from "axios";
+import BASE_URL from "../../../apiConfig";
 const ProjectImage = () => {
   const [fileName, setFileName] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -55,6 +58,7 @@ const ProjectImage = () => {
         image,
         name: fileName[index],
         alt: fileName[index],
+        order: index+1
       }));
       setImageData([...editProject?.images, ...combinedArray]);
       setPdf(editProject?.brochure)
@@ -63,13 +67,45 @@ const ProjectImage = () => {
         image,
         name: fileName[index],
         alt: fileName[index],
+        order: index+1
       }));
       setImageData([...combinedArray]);
       setPdf("")
     }
   }, [images, fileName, editProject?.images]);
+  const onDragEnd = async (result) => {
+    const { destination, source } = result;
 
- 
+    if (!destination) return; // Dropped outside the list
+    if (destination.index === source.index) return; // Dropped in the same position
+
+    const recordedimage = Array.from(imageData);
+    const [movedSpace] = recordedimage.splice(source.index, 1);
+    recordedimage.splice(destination.index, 0, movedSpace);
+
+    // Create the payload with updated priority order for each coworking space
+    const updatedOrderPayload = recordedimage.map((image, index) => ({
+      _id: image._id,
+       order: index + 1,
+    }));
+    setImageData(recordedimage);
+    const updateImages = {
+      _id: editProject?._id,
+      updateImage: updatedOrderPayload
+    }
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/api/project/drag-images`,
+        updateImages
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update priority order.");
+      }
+    } catch (error) {
+      console.error("Error updating priority order:", error);
+      // Handle error (e.g., show an error message to the user)
+    }
+    };
   return (
     <>
       <div className="row top-margin image-border">
@@ -131,8 +167,7 @@ const ProjectImage = () => {
                       <Th>Delete</Th>
                     </Tr>
                   </Thead>
-                  <Tbody>
-                    {imageData?.map((img, index) => (
+                    {/* {imageData?.map((img, index) => (
                       <Fragment key={index}>
                         <Tr>
                           <Td>{index + 1}</Td>
@@ -173,8 +208,75 @@ const ProjectImage = () => {
                           </Td>
                         </Tr>
                       </Fragment>
-                    ))}
-                  </Tbody>
+                    ))} */}
+                     <DragDropContext onDragEnd={onDragEnd}>
+                      <Droppable droppableId="images">
+                        {(provided) => (
+                          <Tbody
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                          >
+                            { imageData.map((img, index) => (
+                                <Draggable
+                                  key={img._id}
+                                  draggableId={img._id}
+                                  index={index}
+                                >
+                                  {(provided) => (
+                                    <Tr
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                    >
+                                      <Td {...provided.dragHandleProps}>
+                                        {index + 1}
+                                      </Td>
+                                      <Td {...provided.dragHandleProps}>
+                                      <img
+                              src={img.image}
+                              alt="media"
+                              width="500px"
+                              height="250px"
+                            />
+                                      </Td>
+                                      <Td {...provided.dragHandleProps}>
+                                   
+                            <input
+                              type="text"
+                              className="form-control"
+                              style={{ color: "#000" }}
+                              value={img.name}
+                            />
+                       
+                                      </Td>
+                                      <Td {...provided.dragHandleProps}>
+                              <input
+                              type="text"
+                              className="form-control"
+                              style={{ color: "#000", minWidth: "200px" }}
+                              value={img.alt?.split(".")[0]}
+                              onChange={(event) =>
+                                handleAltChange(event, index)
+                              }
+                            />
+                                      </Td>
+                                      <Td {...provided.dragHandleProps}>
+                                   
+                                      <AiFillDelete
+                              onClick={() => removePreviewImage(index)}
+                              className="icon"
+                              style={{ color: "red" }}
+                            />
+                                   </Td>
+                                    </Tr>
+                                  )}
+                                </Draggable>
+                              ))
+                            }
+                            {provided.placeholder}
+                          </Tbody>
+                        )}
+                      </Droppable>
+                    </DragDropContext>
                 </Table>
               </TableContainer>
             </div>
