@@ -38,6 +38,8 @@ import {
 } from "./MicrolocationService";
 import Select from "react-select";
 import EditMicrolocation from "./EditMicrolocation";
+import ImageUpload from "../../ImageUpload";
+import { uploadFile } from "../../services/Services";
 function City() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -56,6 +58,9 @@ function City() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAll, setShowAll] = useState(true);
   const { country, setCountry } = GpState();
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [images, setImages] = useState([]);
 
   const [selectItemNum, setSelectItemNum] = useState(10);
   const itemsPerPageHandler = (e) => {
@@ -78,7 +83,14 @@ function City() {
       [name]: value,
     });
   };
+  const previewFile = (data) => {
+    const allimages = images;
+    setImages(allimages.concat(data));
+  };
 
+  const handleUploadFile = async (files) => {
+    await uploadFile(files, setProgress, setIsUploaded, previewFile);
+  };
   const handleSaveMicrolocations = async () => {
     try {
       const { data } = await axios.post(
@@ -86,6 +98,7 @@ function City() {
         {
           name: microlocationfield.name,
           description: microlocationfield.description,
+          image: images[0],
           country: selectedCountry.value,
           state: selectedState.value,
           city: selectedCity.value,
@@ -294,6 +307,16 @@ function City() {
                       className="property-input"
                     />
                   </div>
+                </div>
+                <div className="row">
+                <ImageUpload
+                images={images}
+                setImages={setImages}
+                progress={progress}
+                setProgress={setProgress}
+                uploadFile={handleUploadFile}
+                isUploaded={isUploaded}
+                />
                 </div>
               </ModalBody>
               <ModalFooter>
