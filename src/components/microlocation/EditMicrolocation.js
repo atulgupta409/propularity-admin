@@ -22,6 +22,8 @@ import {
   getCityByState,
   getStateByCountry,
 } from "./MicrolocationService";
+import ImageUpload from "../../ImageUpload";
+import { uploadFile } from "../../services/Services";
 const EditMicrolocation = ({
   microlocations,
   setUpdateTable,
@@ -35,7 +37,18 @@ const EditMicrolocation = ({
   const { country, setCountry } = GpState();
   const [isChecked, setIsChecked] = useState(microlocations.active);
   const [microId, setMicroId] = useState(microlocations._id);
+  const [isUploaded, setIsUploaded] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [images, setImages] = useState([]);
   const toast = useToast();
+  const previewFile = (data) => {
+    const allimages = images;
+    setImages(allimages.concat(data));
+  };
+
+  const handleUploadFile = async (files) => {
+    await uploadFile(files, setProgress, setIsUploaded, previewFile);
+  };
   const handleEditMicrolocation = async () => {
     try {
       const { data } = await axios.put(
@@ -43,6 +56,7 @@ const EditMicrolocation = ({
         {
           name: name,
           description: description,
+          image: images[0],
           country: selectedCountry.value,
           state: selectedState.value,
           city: selectedCity.value,
@@ -231,6 +245,17 @@ const EditMicrolocation = ({
                 />
               </div>
             </div>
+            <div className="row">
+                <ImageUpload
+                images={images}
+                setImages={setImages}
+                progress={progress}
+                setProgress={setProgress}
+                uploadFile={handleUploadFile}
+                isUploaded={isUploaded}
+                />
+                {microlocations.image && <img src={microlocations.image} style={{width: "50%", marginTop: "40px"}}/>}
+                </div>
           </ModalBody>
 
           <ModalFooter>
