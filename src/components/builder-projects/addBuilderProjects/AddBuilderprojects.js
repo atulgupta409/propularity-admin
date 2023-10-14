@@ -130,10 +130,15 @@ function AddBuilderprojects() {
     plans,
     contact_details: contacts,
   };
+  const priorityData = {
+    priority
+  };
+  
+  const savedData = { ...allData, ...priorityData };
   const handleSaveProject = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${BASE_URL}/api/project`, allData);
+      const { data } = await axios.post(`${BASE_URL}/api/project`, savedData);
 
       toast({
         title: "Saved Successfully!",

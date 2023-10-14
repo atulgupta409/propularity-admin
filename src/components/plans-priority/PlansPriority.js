@@ -162,16 +162,7 @@ const filteredPlanType = planTypes.filter(item => {
         `${BASE_URL}/api/project/plans-order/${project._id}`,
         updatedProject
       );
-      //  projects.map((p) => {
-      //   if (p._id === project._id) {
-      //     p.plans_priority.forEach(priority => {
-      //     priority.is_active = checked;
-      //     priority.order = updatedProject.order;
-      //     priority.plans_type = selectedPlanTypeId;
-      //     });
-      //   }
-      //   return p;
-      // });
+    
       project.plans_priority.forEach(priority => {
        return  priority.is_active = checked;
       //  priority.order = updatedProject.order;
