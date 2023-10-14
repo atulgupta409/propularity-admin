@@ -163,9 +163,8 @@ const EditMicrolocation = ({
         onClick={handleClick}
         style={{ fontSize: "22px", cursor: "pointer" }}
       />
-
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
+        <ModalOverlay/>
         <ModalContent>
           <ModalHeader>Modal Title</ModalHeader>
           <ModalCloseButton />

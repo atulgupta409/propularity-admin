@@ -159,16 +159,9 @@ function PriorityProjects() {
         `${BASE_URL}/api/project/change-order/${project._id}`,
         updatedProject
       );
-      // const priorityIndex = project.priority.findIndex(
-      //   (p) => p.microlocationId === selectedMicroLocationId
-      // );
-      // console.log(priorityIndex)
-      // if (priorityIndex !== -1) {
-        // Update the is_active property of the specific priority object
-        project.priority[0].is_active = checked;
-      // }
-      // Update the local state to reflect the change
-        //  project.priority.is_active = checked; 
+      project.priority.forEach(priority => {
+        return  priority.is_active = checked;
+         });
          
       setprojects([...projects]);
       handleFetchPriorityprojects(selectedMicroLocationId);
