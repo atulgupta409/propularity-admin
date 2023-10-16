@@ -55,6 +55,7 @@ function BuilderPriority() {
     setPriorityprojects(data)
     setLoadingTable(false)
   };
+  console.log(priorityprojects)
   const onChangeOptionHandler = (selectedOption, dropdownIdentifier) => {
     switch (dropdownIdentifier) {
       case "PlanType":
@@ -146,34 +147,28 @@ const filteredPlanType = planTypes.filter(item => {
 
     try {
       const selectedPlanTypeId = selectedPlanType?.value;
-      const activePriorityProjects = projects.filter((space) => space.plans_priority.some(p =>{
-        if(p.plans_type && p.plans_type === selectedPlanTypeId) {
-          return p.is_active === true
-        }
-      }));
-      const updatedProject = {
-        is_active: checked,
-        order: checked ? activePriorityProjects.length + 1 : 1000,
+      const updatedproject = {
+        order: checked
+          ? projects.filter((project) => project.plans_priority.is_active == true)
+              .length + 1
+          : 1000,
         plans_type: selectedPlanTypeId,
-        cityId: selectedCity?.value
+        is_active: checked,
+        cityId: selectedCity?.value,
       };
 
       await axios.put(
         `${BASE_URL}/api/project/plans-order/${project._id}`,
-        updatedProject
+        updatedproject
       );
-    
-      project.plans_priority.forEach(priority => {
-       return  priority.is_active = checked;
-      //  priority.order = updatedProject.order;
-      //  priority.plans_type = selectedPlanTypeId;
-        });
+      project.plans_priority.is_active = checked;
       setprojects([...projects]);
-      handleFetchTopProjects(selectedPlanTypeId, selectedCity?.value);
+      handleFetchTopProjects(selectedPlanTypeId,selectedCity?.value);
     } catch (error) {
       console.error("An error occurred:", error);
     }
   };
+ 
   const onDragEnd = async (result) => {
     const { destination, source } = result;
 
@@ -281,9 +276,7 @@ const filteredPlanType = planTypes.filter(item => {
                               <Td>
                                 <input
                                   type="checkbox"
-                                  checked={project.plans_priority.some((prev) =>{ if(prev.plans_type && prev.plans_type === selectedPlanType?.value){
-                                    return prev.is_active
-                                  }} )}
+                                  checked={project.plans_priority.is_active}
                     onChange={(event) =>
                                     handleCheckboxChange(event, project)
                                   }
