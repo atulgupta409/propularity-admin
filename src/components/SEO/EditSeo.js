@@ -147,7 +147,7 @@ const EditSeo = () => {
     setIsChecked(checked);
     setIndexed(checked ? "index, follow" : "noindex, nofollow");
   };
-  if (!title) {
+  if (loading) {
     return <Loader />;
   }
 

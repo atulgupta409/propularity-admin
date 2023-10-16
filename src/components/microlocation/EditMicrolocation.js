@@ -206,7 +206,7 @@ const EditMicrolocation = ({
                   onChange={(selectedOption) =>
                     onChangeOptionHandler(selectedOption, "city")
                   }
-                  isSearchable
+                  isSearchable 
                   required
                 />
               </div>
