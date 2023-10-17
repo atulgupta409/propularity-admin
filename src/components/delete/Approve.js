@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -12,25 +12,42 @@ import {
 } from "@chakra-ui/react";
 import { FiCheckSquare } from "react-icons/fi";
 
-const Approve = ({ handleFunction, isEnabled }) => {
+const Approve = ({id, handleFunction, isEnabled }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const handleApprove = () => {
     handleFunction();
     onClose()
   }
+  const initTooltipforApprove = () => {
+    const approveButton = document.getElementById(`approve-button-${id}`);
+    if (approveButton) {
+      new window.bootstrap.Tooltip(approveButton, {
+        title: "Approve",
+        placement: "top",
+        trigger: "hover",
+      });
+    }
+  };
+useEffect(() => {
+  initTooltipforApprove()
+},[id])
 
   if (!isEnabled) {
     return (
       <button disabled style={{ fontSize: "20px", cursor: "not-allowed", color: "gray" }}>
-        <FiCheckSquare />
+        <FiCheckSquare id={`approve-button-${id}`} />
       </button>
     );
   }
+ 
+ 
+
   return (
     <>
      <button   style={{ fontSize: "20px", cursor: "pointer", color: "rgb(63 211 17)" }}>
      <FiCheckSquare
+      id={`approve-button-${id}`}
         onClick={onOpen}
     
       />

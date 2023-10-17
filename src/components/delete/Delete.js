@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -12,16 +12,31 @@ import {
 } from "@chakra-ui/react";
 import { AiFillDelete } from "react-icons/ai";
 
-const Delete = ({ handleFunction }) => {
+const Delete = ({id, handleFunction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
   const handleDelete = () => {
     handleFunction();
     onClose()
   }
+  const initTooltip = () => {
+    const deleteButton = document.getElementById(`delete-button-${id}`);
+    if (deleteButton) {
+      new window.bootstrap.Tooltip(deleteButton, {
+        title: "Delete",
+        placement: "top",
+        trigger: "hover",
+      });
+    }
+  };
+
+  useEffect(() => {
+    initTooltip();
+  }, [id]);
   return (
     <>
       <AiFillDelete
+        id={`delete-button-${id}`}
         onClick={onOpen}
         style={{ fontSize: "20px", cursor: "pointer", color: "#ff385c" }}
       />
