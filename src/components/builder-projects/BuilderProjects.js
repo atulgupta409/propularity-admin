@@ -252,7 +252,7 @@ useEffect(() => {
   </Tr>
 ) : (
   (showAll ? searchedprojects : projects)
-    .map((project) => (
+    .map((project, index) => (
       <Tr className="table_data_row" key={project._id}>
         <Td className="name_heading">{project.name}</Td>
         <Td className="city_heading">{project.location.city.name}</Td>
@@ -306,9 +306,9 @@ useEffect(() => {
           <div
             className="d-flex justify-content-between align-items-center main-div w-100"
           >
-            <Approve isEnabled={project.status === "reject" || project.status === "pending"} handleFunction={() => handleApprove(project._id)} />
-            <Desable isEnabled={project.status === "approve" || project.status === "pending"} handleFunction={() => handleReject(project._id)} />
-            <Delete handleFunction={() => handleDeleteprojects(project._id)} />
+            <Approve id={index} isEnabled={project.status === "reject" || project.status === "pending"} handleFunction={() => handleApprove(project._id)} />
+            <Desable id={index} isEnabled={project.status === "approve" || project.status === "pending"} handleFunction={() => handleReject(project._id)} />
+            <Delete id={index} handleFunction={() => handleDeleteprojects(project._id)} />
           </div>
         </Td>
       </Tr>
