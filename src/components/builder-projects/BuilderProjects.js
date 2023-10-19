@@ -62,7 +62,7 @@ const getSearchProjects = async() => {
 useEffect(() => {
   if (searchTerm || citySearchTerm || microLocationSearchTerm || searchOption) {
     getSearchProjects();
-    setShowAll(true)
+    setShowAll(true);
   }
   
   else if(searchTerm === "" || citySearchTerm === "" || microLocationSearchTerm === ""){
