@@ -63,7 +63,7 @@ if (selectedPlan) {
     setSelectedPlanName("");
   }
 };
-const residentialPlan = ["6501887887a793abe11b9081", "65018a3c87a793abe11b90a0", "6501860d87a793abe11b8fdb", '6501861387a793abe11b8fe0', '650185fc87a793abe11b8fd1', '650185ef87a793abe11b8fcc', '6501887e87a793abe11b9086', '6501888d87a793abe11b908b', ]
+const residentialPlan = ["6501887887a793abe11b9081", "65018a3c87a793abe11b90a0","6530b4079c394a3277094380", "6501860d87a793abe11b8fdb", '6501861387a793abe11b8fe0', '650185fc87a793abe11b8fd1', '650185ef87a793abe11b8fcc', '6501887e87a793abe11b9086', '6501888d87a793abe11b908b', ]
 const commercialPlan = ["6501889687a793abe11b9090", "6501889f87a793abe11b9095"]
 const filteredPlanType = planType.filter(item => {
   if (selectedCategory === 'residential') {
