@@ -292,7 +292,7 @@ const EditSeo = () => {
                     onChange={(event) =>
                       handleInputChangeObject(event, "twitter", "title")
                     }
-                    value={twitter.title}
+                    value={twitter?.title}
                   />
                   <label htmlFor="floatingInput">Twitter Title</label>
                 </div>
@@ -313,7 +313,7 @@ const EditSeo = () => {
                     onChange={(event) =>
                       handleInputChangeObject(event, "twitter", "description")
                     }
-                    value={twitter.description}
+                    value={twitter?.description}
                   />
                   <label htmlFor="floatingInput">Twitter Description</label>
                 </div>
@@ -335,7 +335,7 @@ const EditSeo = () => {
                     onChange={(event) =>
                       handleInputChangeObject(event, "open_graph", "title")
                     }
-                    value={open_graph.title}
+                    value={open_graph?.title}
                   />
                   <label htmlFor="floatingInput">Open Graph Title</label>
                 </div>
@@ -360,7 +360,7 @@ const EditSeo = () => {
                         "description"
                       )
                     }
-                    value={open_graph.description}
+                    value={open_graph?.description}
                   />
                   <label htmlFor="floatingInput">Open Graph Description</label>
                 </div>
